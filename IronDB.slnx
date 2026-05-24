@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/IronDB.BufferManagement/IronDB.BufferManagement.csproj" />
+    <Project Path="src/IronDB.Common/IronDB.Common.csproj" />
+    <Project Path="src/IronDB.Transport.Tcp/IronDB.Transport.Tcp.csproj" />
+  </Folder>
+</Solution>
