@@ -36,8 +36,8 @@ internal readonly ref struct BitVector
     {
         Contract.Requires(idx >= 0 && idx < Count);
 
-        uint word = ByteForBit(idx);
-        byte mask = BitInByte(idx);
+        uint word = Bits.ByteForBit(idx);
+        byte mask = Bits.BitInByte(idx);
 
         ref byte currentWord = ref Unsafe.AddByteOffset(ref MemoryMarshal.GetReference(_storage), word);
         currentWord |= mask;
@@ -48,8 +48,8 @@ internal readonly ref struct BitVector
     {
         Contract.Requires(idx >= 0 && idx < Count);
 
-        uint word = ByteForBit(idx);
-        byte mask = BitInByte(idx);
+        uint word = Bits.ByteForBit(idx);
+        byte mask = Bits.BitInByte(idx);
 
         ref byte currentWord = ref Unsafe.AddByteOffset(ref MemoryMarshal.GetReference(_storage), word);
 
@@ -65,8 +65,8 @@ internal readonly ref struct BitVector
     {
         Contract.Requires(idx >= 0 && idx < Count);
 
-        uint word = ByteForBit(idx);
-        byte mask = BitInByte(idx);
+        uint word = Bits.ByteForBit(idx);
+        byte mask = Bits.BitInByte(idx);
         return (Unsafe.AddByteOffset(ref MemoryMarshal.GetReference(_storage), word) & mask) != 0;
     }
 
@@ -86,7 +86,7 @@ internal readonly ref struct BitVector
                 continue;
             }
 
-            index += TrailingZeroes(result);
+            index += Bits.TrailingZeroes(result);
             goto Done;
         }
 
@@ -102,7 +102,7 @@ internal readonly ref struct BitVector
 
     Done:
         var value = Unsafe.AddByteOffset(ref storage, index) << ((sizeof(int) - 1) * 8);
-        value = LeadingZeroes((uint)value);
+        value = Bits.LeadingZeroes((uint)value);
         return (value < 8) ? (int)index * 8 + value : -1;
     }
 
@@ -117,9 +117,11 @@ internal readonly ref struct BitVector
             var comparison = Vector128.GreaterThan(input, Vector128<byte>.Zero);
             var result = (uint)Sse2.MoveMask(comparison);
             if (result == 0)
+            {
                 continue;
+            }
 
-            index += TrailingZeroes(result);
+            index += Bits.TrailingZeroes(result);
             goto Done;
         }
 
@@ -135,7 +137,7 @@ internal readonly ref struct BitVector
 
     Done:
         var value = Unsafe.AddByteOffset(ref storage, index) << ((sizeof(int) - 1) * 8);
-        value = LeadingZeroes((uint)value);
+        value = Bits.LeadingZeroes((uint)value);
         return (value < 8) ? (int)index * 8 + value : -1;
     }
 #endif
@@ -156,7 +158,7 @@ internal readonly ref struct BitVector
 
             // On little-endian, the first non-zero byte (lowest address) is in the LSB.
             // TrailingZeroesInBytes finds the byte index of the first non-zero byte.
-            index += TrailingZeroesInBytes(input);
+            index += Bits.TrailingZeroesInBytes(input);
             goto Done;
         }
 
@@ -170,7 +172,7 @@ internal readonly ref struct BitVector
 
     Done:
         value = Unsafe.AddByteOffset(ref storage, (nuint)index) << ((sizeof(int) - 1) * 8);
-        value = LeadingZeroes((uint)value);
+        value = Bits.LeadingZeroes((uint)value);
         return (value < 8) ? (int)index * 8 + value : -1;
     }
 
@@ -179,9 +181,13 @@ internal readonly ref struct BitVector
         ref var storage = ref MemoryMarshal.GetReference(_storage);
 #if NET7_0_OR_GREATER
         if (AdvInstructionSet.X86.IsSupportedAvx256)
+        {
             return IndexOfFirstSetBitAvx2(ref storage, _storage.Length);
+        }
         if (AdvInstructionSet.X86.IsSupportedSse)
+        {
             return IndexOfFirstSetBitSse2(ref storage, _storage.Length);
+        }
 #endif
         return IndexOfFirstSetBitScalar(ref storage, _storage.Length);
     }

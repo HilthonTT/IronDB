@@ -2,7 +2,7 @@
 
 public sealed class DetailedStorageReport
 {
-    public InMemoryStorageState InMemoryState { get; set; } = default!;
+    //public InMemoryStorageState InMemoryState { get; set; } = default!;
 
     public DataFileReport DataFile { get; set; } = default!;
 
@@ -12,7 +12,7 @@ public sealed class DetailedStorageReport
 
     public List<TreeReport> Trees { get; set; } = [];
 
-    public List<TableReport> Tables { get; set; } = [];
+    //public List<TableReport> Tables { get; set; } = [];
 
     public PreAllocatedBuffersReport PreAllocatedBuffers { get; set; } = default!;
 

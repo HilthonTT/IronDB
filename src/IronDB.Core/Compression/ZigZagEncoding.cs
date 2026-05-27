@@ -1,0 +1,194 @@
+﻿using System.Runtime.CompilerServices;
+
+namespace IronDB.Core.Compression;
+
+internal static class ZigZagEncoding
+{
+    public const int MaxEncodedSize = 10;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int Encode<T>(Span<byte> buffer, T value, int pos = 0) where T : unmanaged
+    {
+        int sizeOfTInBits = Unsafe.SizeOf<T>() * 8 - 1;
+        if (typeof(T) == typeof(sbyte))
+        {
+            sbyte sb = (sbyte)(object)value;
+
+            byte uv = (byte)((sb << 1) ^ (sb >> sizeOfTInBits));
+            return VariableSizeEncoding.Write(buffer, uv, pos);
+        }
+
+        if (typeof(T) == typeof(short))
+        {
+            short ss = (short)(object)value;
+
+            ushort uv = (ushort)((ss << 1) ^ (ss >> sizeOfTInBits));
+            return VariableSizeEncoding.Write(buffer, uv, pos);
+        }
+
+        if (typeof(T) == typeof(int))
+        {
+            int si = (int)(object)value;
+
+            uint uv = (uint)((si << 1) ^ (si >> sizeOfTInBits));
+            return VariableSizeEncoding.Write(buffer, uv, pos);
+        }
+
+        if (typeof(T) == typeof(long))
+        {
+            long ul = (long)(object)value;
+
+            ulong uv = (ulong)((ul << 1) ^ (ul >> sizeOfTInBits));
+            return VariableSizeEncoding.Write(buffer, uv, pos);
+        }
+
+        throw new NotSupportedException($"The type {nameof(T)} is not supported to be written.");
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static unsafe int Encode<T>(byte* buffer, T value, int pos = 0) where T : unmanaged
+    {
+        int sizeOfTInBits = Unsafe.SizeOf<T>() * 8 - 1;
+        if (typeof(T) == typeof(sbyte))
+        {
+            sbyte sb = (sbyte)(object)value;
+
+            byte uv = (byte)((sb << 1) ^ (sb >> sizeOfTInBits));
+            return VariableSizeEncoding.Write(buffer + pos, uv);
+        }
+
+        if (typeof(T) == typeof(short))
+        {
+            short ss = (short)(object)value;
+
+            ushort uv = (ushort)((ss << 1) ^ (ss >> sizeOfTInBits));
+            return VariableSizeEncoding.Write(buffer + pos, uv);
+        }
+
+        if (typeof(T) == typeof(int))
+        {
+            int si = (int)(object)value;
+
+            uint uv = (uint)((si << 1) ^ (si >> sizeOfTInBits));
+            return VariableSizeEncoding.Write(buffer + pos, uv);
+        }
+
+        if (typeof(T) == typeof(long))
+        {
+            long ul = (long)(object)value;
+
+            ulong uv = (ulong)((ul << 1) ^ (ul >> sizeOfTInBits));
+            return VariableSizeEncoding.Write(buffer + pos, uv);
+        }
+
+        throw new NotSupportedException($"The type {nameof(T)} is not supported to be written.");
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T Decode<T>(ReadOnlySpan<byte> buffer, int pos = 0) where T : unmanaged
+    {
+        T value = VariableSizeEncoding.Read<T>(buffer, out int _, pos);
+        return UnZag(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static unsafe T Decode<T>(byte* buffer, out int len, int pos = 0) where T : unmanaged
+    {
+        T value = VariableSizeEncoding.Read<T>(buffer + pos, out len);
+        return UnZag(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static unsafe T DecodeCompact<T>(byte* buffer, out int len, out bool success, int pos = 0) where T : unmanaged
+    {
+        T value = VariableSizeEncoding.ReadCompact<T>(buffer + pos, out len, out success);
+        return UnZag(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T DecodeCompact<T>(ReadOnlySpan<byte> buffer, out int len, out bool success, int pos = 0) where T : unmanaged
+    {
+        T value = VariableSizeEncoding.ReadCompact<T>(buffer, pos, out len, out success);
+        return UnZag(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T Decode<T>(ReadOnlySpan<byte> buffer, out int len, int pos = 0) where T : unmanaged
+    {
+        T value = VariableSizeEncoding.Read<T>(buffer, out len, pos);
+        return UnZag(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static long[] DecodeDebug(ReadOnlySpan<byte> buffer)
+    {
+        int count = UnZag(VariableSizeEncoding.Read<int>(buffer, out var len, 0));
+        var results = new long[count];
+        var pos = len;
+        long cur = 0;
+        for (int i = 0; i < count; i++)
+        {
+            cur += Decode<long>(buffer, out len, pos);
+            results[i] = cur;
+            pos += len;
+        }
+        return results;
+    }
+
+    public static int SizeOf2<T>(ReadOnlySpan<byte> buffer, int pos = 0) where T : unmanaged
+    {
+        VariableSizeEncoding.Read<T>(buffer, out int fst, pos);
+        VariableSizeEncoding.Read<T>(buffer, out int snd, pos + fst);
+        return fst + snd;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static (T, T) Decode2<T>(ReadOnlySpan<byte> buffer, out int len, int pos = 0) where T : unmanaged
+    {
+        T one = UnZag(VariableSizeEncoding.Read<T>(buffer, out int fst, pos));
+        T two = UnZag(VariableSizeEncoding.Read<T>(buffer, out int snd, pos + fst));
+
+        len = fst + snd;
+        return (one, two);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static unsafe (T, T) Decode2<T>(byte* buffer, out int len, int pos = 0) where T : unmanaged
+    {
+        T one = UnZag(VariableSizeEncoding.Read<T>(buffer + pos, out int fst));
+        T two = UnZag(VariableSizeEncoding.Read<T>(buffer + pos + fst, out int snd));
+
+        len = fst + snd;
+        return (one, two);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static T UnZag<T>(T value) where T : unmanaged
+    {
+        if (typeof(T) == typeof(sbyte))
+        {
+            var b = (byte)(sbyte)(object)value;
+            return (T)(object)(sbyte)((b & 1) != 0 ? (sbyte)(b >> 1) ^ -1 : (sbyte)(b >> 1));
+        }
+
+        if (typeof(T) == typeof(short))
+        {
+            var us = (ushort)(short)(object)value;
+            return (T)(object)(short)((us & 1) != 0 ? (short)(us >> 1) ^ -1 : (short)(us >> 1));
+        }
+
+        if (typeof(T) == typeof(int))
+        {
+            var ui = (uint)(int)(object)value;
+            return (T)(object)((ui & 1) != 0 ? (int)(ui >> 1) ^ -1 : (int)(ui >> 1));
+        }
+
+        if (typeof(T) == typeof(long))
+        {
+            var ul = (ulong)(long)(object)value;
+            return (T)(object)((ul & 1) != 0 ? (long)(ul >> 1) ^ -1 : (long)(ul >> 1));
+        }
+
+        throw new NotSupportedException($"The type {nameof(T)} is not supported to be read.");
+    }
+}

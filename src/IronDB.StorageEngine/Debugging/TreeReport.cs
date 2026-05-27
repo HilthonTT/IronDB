@@ -2,7 +2,7 @@
 
 public sealed class TreeReport
 {
-    public RootObjectType Type { get; set; }
+    //public RootObjectType Type { get; set; }
 
     public string Name { get; set; } = string.Empty;
 
