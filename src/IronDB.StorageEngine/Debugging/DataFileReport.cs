@@ -1,5 +1,4 @@
 ﻿using IronDB.Core;
-using System.Drawing;
 
 namespace IronDB.StorageEngine.Debugging;
 

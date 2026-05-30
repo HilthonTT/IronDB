@@ -26,6 +26,10 @@ public sealed class FastStack<T> : IEnumerable<T>
         _array = new T[capacity];
     }
 
+    public FastStack()
+    {
+    }
+
     public int Count => _size;
 
     /// <summary>
@@ -51,6 +55,12 @@ public sealed class FastStack<T> : IEnumerable<T>
         {
             Array.Clear(_array, 0, size); // Clear the elements so that the gc can reclaim the references.
         }
+    }
+
+    public void WeakClear()
+    {
+        _size = 0;
+        _version++;
     }
 
     public IEnumerator<T> GetEnumerator()
