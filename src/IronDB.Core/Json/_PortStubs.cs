@@ -315,21 +315,3 @@ public readonly struct BlittableVectorHeader
     public BlittableVectorType Type => throw new NotImplementedException();
     public int Length => throw new NotImplementedException();
 }
-
-/// <summary>Hashing helpers. Stub.</summary>
-public static class Hashing
-{
-    public static ulong Combine(ulong a, ulong b) => throw new NotImplementedException();
-    public static ulong Mix(ulong v) => throw new NotImplementedException();
-
-    public static class XXHash64
-    {
-        public static unsafe ulong Calculate(byte* buffer, ulong length, ulong seed = 0)
-            => throw new NotImplementedException();
-
-        public static unsafe ulong Calculate(byte* buffer, int length, ulong seed = 0)
-            => throw new NotImplementedException();
-
-        public static ulong Calculate(string value) => throw new NotImplementedException();
-    }
-}

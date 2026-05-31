@@ -62,13 +62,13 @@ public sealed class ReferenceEqualityComparer<T> : IEqualityComparer<T> where T 
 }
 
 /// <summary>Equality comparer for <c>StringSegment</c> values. Stub.</summary>
-public sealed class StringSegmentEqualityStructComparer : IEqualityComparer<IronDB.Core.Json.StringSegment>
+public sealed class StringSegmentEqualityStructComparer : IEqualityComparer<StringSegment>
 {
     public static readonly StringSegmentEqualityStructComparer BoxedInstance = new();
 
-    public bool Equals(IronDB.Core.Json.StringSegment x, IronDB.Core.Json.StringSegment y)
+    public bool Equals(StringSegment x, StringSegment y)
         => throw new NotImplementedException();
 
-    public int GetHashCode(IronDB.Core.Json.StringSegment obj)
+    public int GetHashCode(StringSegment obj)
         => throw new NotImplementedException();
 }
