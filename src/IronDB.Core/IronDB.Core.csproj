@@ -7,4 +7,16 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Hashing.Streamed.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Hashing.Streamed.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.1" />
+  </ItemGroup>
+
 </Project>
