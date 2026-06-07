@@ -188,26 +188,6 @@ public sealed class CachedProperties
     public void Reset() => throw new NotImplementedException();
 }
 
-/// <summary>Cache of path lookups for blittable document navigation. Stub.</summary>
-public sealed class PathCache
-{
-    public void AcquirePathCache(
-        out Dictionary<StringSegment, object> pathCache,
-        out Dictionary<int, object> pathCacheByIndex)
-    {
-        pathCache = null!;
-        pathCacheByIndex = null!;
-        throw new NotImplementedException();
-    }
-
-    public void ReleasePathCache(
-        Dictionary<StringSegment, object> pathCache,
-        Dictionary<int, object> pathCacheByIndex)
-        => throw new NotImplementedException();
-
-    public void ClearUnreturnedPathCache() => throw new NotImplementedException();
-}
-
 /// <summary>Type-keyed value cache used by the object parser. Stub.</summary>
 public sealed class ReplacementTypeCache<TValue>
 {
