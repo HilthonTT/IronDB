@@ -1,9 +1,7 @@
 ﻿#nullable disable warnings
 // Nullable warnings temporarily disabled while the port stabilizes — annotations remain valid; re-enable per-region as ported.
 
-using IronDB.Core;
 using IronDB.Core.Collections;
-using IronDB.Core.Extensions;
 using IronDB.Core.Json.Parsing;
 using IronDB.Core.Threading;
 using IronDB.Core.Utils;
@@ -38,13 +36,13 @@ public partial class JsonOperationContext : PooledItem
     private ArenaMemoryAllocator? _arenaAllocatorForLongLivedValues;
     private AllocatedMemoryData? _tempBuffer;
 
-    private readonly Dictionary<StringSegment, LazyStringValue> _fieldNames = new Dictionary<StringSegment, LazyStringValue>(StringSegmentEqualityStructComparer.BoxedInstance);
+    private readonly Dictionary<StringSegment, LazyStringValue> _fieldNames = new(StringSegmentEqualityStructComparer.BoxedInstance);
 
-    private static readonly PerCoreContainer<PathCache> _perCorePathCache = new PerCoreContainer<PathCache>();
+    private static readonly PerCoreContainer<PathCache> _perCorePathCache = new();
     private PathCache? _activeAllocatePathCaches;
-    private readonly Stack<MemoryStream> _cachedMemoryStreams = new Stack<MemoryStream>();
+    private readonly Stack<MemoryStream> _cachedMemoryStreams = new();
 
-    private static readonly PerCoreContainer<FastList<LazyStringValue>> _perCoreLazyStringValuesList = new PerCoreContainer<FastList<LazyStringValue>>(32);
+    private static readonly PerCoreContainer<FastList<LazyStringValue>> _perCoreLazyStringValuesList = new(32);
     private int _numberOfAllocatedStringsValues;
     private FastList<LazyStringValue>? _allocateStringValues;
 

@@ -202,30 +202,6 @@ public sealed class ReplacementTypeCache<TValue>
     public void Put(Type type, TValue value) => throw new NotImplementedException();
 }
 
-// ---------------------------------------------------------------------------
-// Pooling infrastructure
-// ---------------------------------------------------------------------------
-
-/// <summary>Per-CPU bucket container. Stub.</summary>
-public sealed class PerCoreContainer<T>
-    where T : class
-{
-    public PerCoreContainer() { }
-    public PerCoreContainer(int capacityPerCore) => _ = capacityPerCore;
-
-    public bool TryPull(out T value)
-    {
-        value = null!;
-        return false;
-    }
-
-    public bool TryPush(T value)
-    {
-        _ = value;
-        return false;
-    }
-}
-
 /// <summary>Base for typed context pools. Stub.</summary>
 public abstract class JsonContextPoolBase<T>
     where T : JsonOperationContext
@@ -236,18 +212,6 @@ public abstract class JsonContextPoolBase<T>
 // ---------------------------------------------------------------------------
 // Unmanaged buffer wrapper
 // ---------------------------------------------------------------------------
-
-/// <summary>Wrapper around a raw unmanaged buffer exposing it as <see cref="System.Memory{T}"/>. Stub.</summary>
-public sealed unsafe class UnmanagedMemory
-{
-    public UnmanagedMemory(byte* address, int size)
-    {
-        _ = address;
-        _ = size;
-    }
-
-    public Memory<byte> Memory => throw new NotImplementedException();
-}
 
 // ---------------------------------------------------------------------------
 // Text writer (async)
