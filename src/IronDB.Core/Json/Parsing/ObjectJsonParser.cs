@@ -120,7 +120,7 @@ public sealed unsafe class ObjectJsonParser(JsonParserState state, JsonOperation
 
     private static readonly ReplacementTypeCache<KnownJsonObjectType> TypeCache = new(4096);
 
-    private KnownJsonObjectType GetKnownJsonObjectTypeUnlikely(object current)
+    private static KnownJsonObjectType GetKnownJsonObjectTypeUnlikely(object current)
     {
         var type = current.GetType();
         if (current is IDynamicJson idj)

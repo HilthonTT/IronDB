@@ -1,4 +1,6 @@
-﻿namespace IronDB.Core.Debugging;
+﻿using IronDB.Core.Json;
+
+namespace IronDB.Core.Debugging;
 
 internal static class DebugStuff
 {
@@ -10,8 +12,8 @@ internal static class DebugStuff
 
         void DecrementContext();
 
-        //void RegisterContextAllocation(JsonOperationContext context, string stackTrace);
+        void RegisterContextAllocation(JsonOperationContext context, string stackTrace);
 
-        //void UnregisterContextAllocation(JsonOperationContext context);
+        void UnregisterContextAllocation(JsonOperationContext context);
     }
 }

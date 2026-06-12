@@ -1,16 +1,6 @@
-// STUBS: minimal types added to satisfy the compiler while the full blittable JSON
-// subsystem port is in progress. All members throw NotImplementedException — they exist
-// solely to make the project compile. Remove this file as real implementations land.
-
 using IronDB.Core.Json.Parsing;
-using IronDB.Core.Threading;
-using IronDB.Core.Utils;
 
 namespace IronDB.Core.Json;
-
-// ---------------------------------------------------------------------------
-// Document builders
-// ---------------------------------------------------------------------------
 
 /// <summary>Builds blittable JSON documents from a parser stream. Stub.</summary>
 public sealed class BlittableJsonDocumentBuilder : IDisposable
@@ -84,10 +74,6 @@ public sealed class ManualBlittableJsonDocumentBuilder<TWriter>
 public interface IBlittableDocumentModifier
 {
 }
-
-// ---------------------------------------------------------------------------
-// Reader companions
-// ---------------------------------------------------------------------------
 
 /// <summary>Reader for blittable JSON arrays. Stub.</summary>
 public sealed unsafe class BlittableJsonReaderArray : IEnumerable<object>, IDisposable
@@ -188,34 +174,12 @@ public sealed class CachedProperties
     public void Reset() => throw new NotImplementedException();
 }
 
-/// <summary>Type-keyed value cache used by the object parser. Stub.</summary>
-public sealed class ReplacementTypeCache<TValue>
-{
-    public ReplacementTypeCache(int capacity) => _ = capacity;
-
-    public bool TryGet(Type type, out TValue value)
-    {
-        value = default!;
-        return false;
-    }
-
-    public void Put(Type type, TValue value) => throw new NotImplementedException();
-}
-
 /// <summary>Base for typed context pools. Stub.</summary>
 public abstract class JsonContextPoolBase<T>
     where T : JsonOperationContext
 {
     public abstract IDisposable AllocateOperationContext(out T context);
 }
-
-// ---------------------------------------------------------------------------
-// Unmanaged buffer wrapper
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// Text writer (async)
-// ---------------------------------------------------------------------------
 
 /// <summary>Async streaming blittable JSON text writer. Stub.</summary>
 public sealed class AsyncBlittableJsonTextWriter : IAsyncDisposable
