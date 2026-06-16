@@ -1,5 +1,6 @@
 ﻿using IronDB.Core.Json;
 using System.Diagnostics;
+using static IronDB.Core.Json.JsonOperationContext.MemoryBuffer;
 
 namespace IronDB.Core;
 
@@ -11,7 +12,7 @@ public sealed class PeepingTomStream : IDisposable
     private int _pos;
     private readonly Stream _stream;
     private bool _firstWindow = true;
-    private IDisposable? _returnBuffer;
+    private ReturnBuffer? _returnBuffer;
 
     public PeepingTomStream(Stream stream, JsonOperationContext context)
     {
