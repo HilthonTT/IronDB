@@ -119,12 +119,6 @@ public sealed unsafe class BlittableJsonReaderVector : IDisposable
     public void Dispose() => throw new NotImplementedException();
 }
 
-/// <summary>Container for a blittable JSON document held by another object. Stub.</summary>
-public interface IBlittableJsonContainer
-{
-    BlittableJsonReaderObject? BlittableJson { get; }
-}
-
 // ---------------------------------------------------------------------------
 // Parser + property cache
 // ---------------------------------------------------------------------------
@@ -195,31 +189,4 @@ public sealed class AsyncBlittableJsonTextWriter : IAsyncDisposable
     public ValueTask FlushAsync(CancellationToken token = default) => throw new NotImplementedException();
 
     public ValueTask DisposeAsync() => throw new NotImplementedException();
-}
-
-/// <summary>Synchronous blittable JSON text writer. Stub.</summary>
-public sealed class BlittableJsonTextWriter : IDisposable
-{
-    public BlittableJsonTextWriter(JsonOperationContext context, Stream stream)
-    {
-        _ = context;
-        _ = stream;
-    }
-
-    public void WriteObject(BlittableJsonReaderObject obj) => throw new NotImplementedException();
-
-    public void Dispose() => throw new NotImplementedException();
-}
-
-/// <summary>Factory for recyclable memory streams. Stub.</summary>
-public static class RecyclableMemoryStreamFactory
-{
-    public static MemoryStream GetRecyclableStream() => new MemoryStream();
-}
-
-/// <summary>Vector data header. Stub.</summary>
-public readonly struct BlittableVectorHeader
-{
-    public BlittableVectorType Type => throw new NotImplementedException();
-    public int Length => throw new NotImplementedException();
 }

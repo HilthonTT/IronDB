@@ -4,6 +4,7 @@
 using IronDB.Core;
 using IronDB.Core.Compression;
 using IronDB.Core.Json.Parsing;
+using IronDB.Core.Json.Sync;
 using System.Buffers.Text;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -81,10 +82,8 @@ public sealed unsafe class BlittableJsonReaderObject : BlittableJsonReaderBase, 
     {
         AssertContextNotDisposed();
 
-        using (var writer = new BlittableJsonTextWriter(_context, stream))
-        {
-            writer.WriteObject(this);
-        }
+        using var writer = new BlittableJsonTextWriter(_context, stream);
+        writer.WriteObject(this);
     }
 
     public BlittableJsonReaderObject(byte* mem, int size, JsonOperationContext context, UnmanagedWriteBuffer buffer = default(UnmanagedWriteBuffer))
