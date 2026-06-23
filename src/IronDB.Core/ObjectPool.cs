@@ -1,13 +1,19 @@
-﻿using IronDB.Core.Threading;
-using IronDB.Core.Utils;
+﻿using IronDB.Core.Utils;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace IronDB.Core;
 
-internal sealed class ObjectPool<T>
-    where T : class
+internal sealed class ObjectPool<T> : ObjectPool<T, NoResetSupport<T>>
+       where T : class
 {
+    public ObjectPool(Factory factory) : base(factory)
+    {
+    }
+
+    public ObjectPool(Factory factory, int size) : base(factory, size)
+    {
+    }
 }
 
 internal class ObjectPool<T, TResetBehavior>

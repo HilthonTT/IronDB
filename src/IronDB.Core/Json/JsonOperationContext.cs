@@ -444,13 +444,13 @@ public partial class JsonOperationContext : PooledItem
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public LazyStringValue GetLazyStringForFieldWithCaching(string field)
+    public LazyStringValue GetLazyStringForFieldWithCaching(string? field)
     {
         EnsureNotDisposed();
         if (_fieldNames.TryGetValue(field, out LazyStringValue value))
         {
             // PERF: This is usually the most common scenario, so actually being contiguous improves the behavior.
-            Debug.Assert(value.IsDisposed == false);
+            Debug.Assert(!value.IsDisposed);
             return value;
         }
 

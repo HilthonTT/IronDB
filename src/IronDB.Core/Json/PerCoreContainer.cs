@@ -79,8 +79,13 @@ public sealed class PerCoreContainer<T> : IEnumerable<T>
         return false;
     }
 
-    public bool TryPush(T cur)
+    public bool TryPush(T? cur)
     {
+        if (cur is null)
+        {
+            return false;
+        }
+
         int currentProcessorId = CurrentProcessorIdHelper.GetCurrentProcessorId() % _perCoreArrays.Length;
         if (_perCoreArrayLength[currentProcessorId].Value >= _numberOfSlotsPerCore)
         {
@@ -96,7 +101,7 @@ public sealed class PerCoreContainer<T> : IEnumerable<T>
                 continue;
             }
 
-            if (Interlocked.CompareExchange(ref core[i], cur, null) == null)
+            if (Interlocked.CompareExchange(ref core[i], cur, null) is null)
             {
                 Interlocked.Increment(ref _perCoreArrayLength[currentProcessorId].Value);
                 return true;

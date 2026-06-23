@@ -86,6 +86,8 @@ public abstract unsafe class AbstractBlittableJsonTextWriter
 
     }
 
+    public void WriteValue(BlittableJsonToken token, object value) => throw new NotImplementedException();
+
     protected virtual bool FlushInternal()
     {
         ObjectDisposedException.ThrowIf(_stream is null, "The stream was closed already.");

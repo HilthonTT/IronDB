@@ -1,7 +1,6 @@
 ﻿#nullable disable warnings
 // Nullable warnings temporarily disabled while the port stabilizes — annotations remain valid; re-enable per-region as ported.
 
-using IronDB.Core;
 using IronDB.Core.Compression;
 using IronDB.Core.Json.Parsing;
 using IronDB.Core.Json.Sync;
