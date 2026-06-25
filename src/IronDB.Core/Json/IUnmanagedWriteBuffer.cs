@@ -1,4 +1,8 @@
-﻿using IronDB.Core.Json.Parsing;
+using IronDB.Core;
+using IronDB.Core.Binary;
+using IronDB.Core.Json.Parsing;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace IronDB.Core.Json;
 
@@ -11,5 +15,5 @@ public unsafe interface IUnmanagedWriteBuffer : IDisposableQueryable, IDisposabl
     void Write<T>(in ReadOnlySpan<T> buffer) where T : unmanaged;
     void WriteByte(byte data);
     void EnsureSingleChunk(JsonParserState state);
-    void EnsureSingleChunk(out byte* chunkPtr, out int size);
+    void EnsureSingleChunk(out byte* ptr, out int size);
 }

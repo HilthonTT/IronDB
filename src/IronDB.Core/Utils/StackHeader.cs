@@ -1,6 +1,7 @@
 ﻿namespace IronDB.Core.Utils;
 
-internal sealed class StackHeader<T>
+public class StackHeader<T>
+    where T : class
 {
     public static readonly StackNode<T> HeaderDisposed = new();
 

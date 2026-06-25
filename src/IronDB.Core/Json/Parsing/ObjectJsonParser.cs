@@ -849,11 +849,6 @@ public sealed unsafe class ObjectJsonParser(JsonParserState state, JsonOperation
         // all floats are valid by definition
     }
 
-    public void ValidatePool()
-    {
-        // no-op: ObjectJsonParser does not use a pool
-    }
-
     public string GenerateErrorState()
     {
         var last = _elements.LastOrDefault();

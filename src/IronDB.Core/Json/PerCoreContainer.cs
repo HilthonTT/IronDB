@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace IronDB.Core.Json;
 
-public sealed class PerCoreContainer<T> : IEnumerable<T>
+public sealed class PerCoreContainer<T> : IEnumerable<(T Item, (int, int) Pos)>
     where T : class
 {
     private const int DefaultCapacityPerCore = 64;
@@ -25,7 +25,7 @@ public sealed class PerCoreContainer<T> : IEnumerable<T>
         }
     }
 
-    public IEnumerator<T> GetEnumerator()
+    public IEnumerator<(T Item, (int, int) Pos)> GetEnumerator()
     {
         for (int gi = 0; gi < _perCoreArrays.Length; gi++)
         {
@@ -37,13 +37,8 @@ public sealed class PerCoreContainer<T> : IEnumerable<T>
                 {
                     continue;
                 }
-                if (Interlocked.CompareExchange(ref array[li]!, null, copy) != copy)
-                {
-                    continue;
-                }
 
-                Interlocked.Decrement(ref _perCoreArrayLength[gi].Value);
-                yield return copy;
+                yield return (copy, (gi, li));
             }
         }
     }
@@ -141,7 +136,7 @@ public sealed class PerCoreContainer<T> : IEnumerable<T>
             return false;
         }
 
-        if (Interlocked.CompareExchange(ref array[pos.Item1]!, null, item) == item)
+        if (Interlocked.CompareExchange(ref array[pos.Item2]!, null, item) == item)
         {
             Interlocked.Decrement(ref _perCoreArrayLength[pos.Item1].Value);
             return true;

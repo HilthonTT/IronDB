@@ -6,8 +6,6 @@ public interface IJsonParser : IDisposable
 
     void ValidateFloat();
 
-    void ValidatePool();
-
     string GenerateErrorState();
 
     OnStringReadDelegate OnStringRead { set; }
