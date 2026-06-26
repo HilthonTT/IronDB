@@ -5,6 +5,7 @@
   <Folder Name="/src/">
     <Project Path="src/IronDB.BufferManagement/IronDB.BufferManagement.csproj" />
     <Project Path="src/IronDB.Common/IronDB.Common.csproj" />
+    <Project Path="src/IronDB.Core.Server/IronDB.Core.Server.csproj" Id="17d3c674-ca9b-44e1-a76b-4c9966c83867" />
     <Project Path="src/IronDB.Core/IronDB.Core.csproj" Id="27bfcc61-b1e8-42e6-82bf-145cb0576817" />
     <Project Path="src/IronDB.StorageEngine/IronDB.StorageEngine.csproj" Id="32451ecc-87a7-42ff-8eb5-fd89405041ad" />
     <Project Path="src/IronDB.Transport.Tcp/IronDB.Transport.Tcp.csproj" />
