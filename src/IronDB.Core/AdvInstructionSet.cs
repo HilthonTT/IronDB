@@ -4,7 +4,7 @@ using System.Runtime.Intrinsics.X86;
 
 namespace IronDB.Core;
 
-internal static class AdvInstructionSet
+public static class AdvInstructionSet
 {
     // PERF: Because all those values are static readonly booleans that are defined during the process of loading the type,
     // the JIT will detect them as such and will use the values instead. 
