@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NLog" Version="6.1.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\IronDB.Core\IronDB.Core.csproj" />
   </ItemGroup>
 
