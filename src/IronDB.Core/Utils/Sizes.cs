@@ -1,6 +1,6 @@
 namespace IronDB.Core.Utils;
 
-internal static class Sizes
+public static class Sizes
 {
     private const double GB = 1024 * 1024 * 1024;
     private const double MB = 1024 * 1024;

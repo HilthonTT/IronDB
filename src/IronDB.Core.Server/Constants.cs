@@ -13,8 +13,8 @@ internal static class Constants
 
     internal static class Logging
     {
-        internal static List<JsonAttribute> DefaultAdminLogsJsonAttributes = new()
-        {
+        internal static List<JsonAttribute> DefaultAdminLogsJsonAttributes =
+        [
             new JsonAttribute("Date", "${longdate}"),
             new JsonAttribute("Level", "${level:uppercase=true}"),
             new JsonAttribute("ThreadID", "${threadid}"),
@@ -23,6 +23,6 @@ internal static class Constants
             new JsonAttribute("Logger", "${logger}"),
             new JsonAttribute("Message", "${message:withexception=true}"),
             new JsonAttribute("Data", "${event-properties:item=Data}"),
-        };
+        ];
     }
 }

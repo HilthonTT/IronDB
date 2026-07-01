@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace IronDB.Core.Binary;
 
-internal static class Bits
+public static class Bits
 {
     public const int InByte = 8;
     public const int InShort = 16;
@@ -27,28 +27,28 @@ internal static class Bits
     // Code taken from http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogDeBruijn
 
     private static readonly byte[] MultiplyDeBruijnBitPosition =
-            {
-                0, 9, 1, 10, 13, 21, 2, 29, 11, 14, 16, 18, 22, 25, 3, 30,
-                8, 12, 20, 28, 15, 17, 24, 7, 19, 27, 23, 6, 26, 5, 4, 31
-            };
+    [
+        0, 9, 1, 10, 13, 21, 2, 29, 11, 14, 16, 18, 22, 25, 3, 30,
+        8, 12, 20, 28, 15, 17, 24, 7, 19, 27, 23, 6, 26, 5, 4, 31
+    ];
 
     // De Bruijn lookup table for 32-bit trailing zero count (constant 0x077CB531)
     private static readonly byte[] TrailingZeroDeBruijnBitPosition =
-            {
-                0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,
-                31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
-            };
+    [
+        0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,
+        31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
+    ];
 
     private static readonly byte[] DeBruijnBytePos64 =
-        {
-            0, 0, 0, 0, 0, 1, 1, 2, 0, 3, 1, 3, 1, 4, 2, 7, 0, 2, 3, 6, 1, 5, 3, 5, 1, 3, 4, 4, 2, 5, 6, 7,
-            7, 0, 1, 2, 3, 3, 4, 6, 2, 6, 5, 5, 3, 4, 5, 6, 7, 1, 2, 4, 6, 4, 4, 5, 7, 2, 6, 5, 7, 6, 7, 7
-        };
+    [
+        0, 0, 0, 0, 0, 1, 1, 2, 0, 3, 1, 3, 1, 4, 2, 7, 0, 2, 3, 6, 1, 5, 3, 5, 1, 3, 4, 4, 2, 5, 6, 7,
+        7, 0, 1, 2, 3, 3, 4, 6, 2, 6, 5, 5, 3, 4, 5, 6, 7, 1, 2, 4, 6, 4, 4, 5, 7, 2, 6, 5, 7, 6, 7, 7
+    ];
 
     private static readonly byte[] DeBruijnBytePos32 =
-        {
-            0, 0, 3, 0, 3, 1, 3, 0, 3, 2, 2, 1, 3, 2, 0, 1, 3, 3, 1, 2, 2, 2, 2, 0, 3, 1, 2, 0, 1, 0, 1, 1
-        };
+    [
+        0, 0, 3, 0, 3, 1, 3, 0, 3, 2, 2, 1, 3, 2, 0, 1, 3, 3, 1, 2, 2, 2, 2, 0, 3, 1, 2, 0, 1, 0, 1, 1
+    ];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int MostSignificantBit(uint n)
@@ -79,7 +79,10 @@ internal static class Bits
     {
         unchecked
         {
-            if (nn == 0) return 0;
+            if (nn == 0)
+            {
+                return 0;
+            }
 
             ulong n = (ulong)nn;
             int msb = 0;

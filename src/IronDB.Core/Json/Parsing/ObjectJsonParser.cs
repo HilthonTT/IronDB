@@ -587,7 +587,7 @@ public sealed unsafe class ObjectJsonParser(JsonParserState state, JsonOperation
 #endif
                 case KnownJsonObjectType.DateTime:
                     {
-                        auxiliaryString = ((DateTime)current).GetDefaultRavenFormat();
+                        auxiliaryString = ((DateTime)current).GetDefaultIronFormat();
                         auxiliaryToken = JsonParserToken.String;
                         goto case KnownJsonObjectType.HandleSetStringBufferOptimization;
                     }

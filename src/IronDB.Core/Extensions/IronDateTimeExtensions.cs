@@ -94,7 +94,7 @@ public static class IronDateTimeExtensions
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static unsafe void ProcessDefaultRavenFormat(long ticks, char* chars)
+    private static unsafe void ProcessDefaultIronFormat(long ticks, char* chars)
     {
         // n = number of days since 1/1/0001
         int n = (int)(ticks / TicksPerDay);
@@ -187,7 +187,7 @@ public static class IronDateTimeExtensions
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static unsafe void ProcessDefaultRavenFormat(long ticks, byte* chars)
+    internal static unsafe void ProcessDefaultIronFormat(long ticks, byte* chars)
     {
         // n = number of days since 1/1/0001
         int n = (int)(ticks / TicksPerDay);
@@ -286,7 +286,7 @@ public static class IronDateTimeExtensions
     /// <param name="dt"></param>
     /// <param name="isUtc"></param>
     /// <returns></returns>
-    public static unsafe string GetDefaultRavenFormat(this DateTime dt, bool isUtc)
+    public static unsafe string GetDefaultIronFormat(this DateTime dt, bool isUtc)
     {
         ValidateDate(dt, isUtc);
 
@@ -296,15 +296,15 @@ public static class IronDateTimeExtensions
 
         fixed (char* chars = result)
         {
-            ProcessDefaultRavenFormat(ticks, chars);
+            ProcessDefaultIronFormat(ticks, chars);
         }
 
         return result;
     }
 
-    public static string GetDefaultRavenFormat(this DateTime dt)
+    public static string GetDefaultIronFormat(this DateTime dt)
     {
-        return GetDefaultRavenFormat(dt, dt.Kind == DateTimeKind.Utc);
+        return GetDefaultIronFormat(dt, dt.Kind == DateTimeKind.Utc);
     }
 
     /// <summary>
@@ -314,7 +314,7 @@ public static class IronDateTimeExtensions
     /// <param name="dt"></param>
     /// <param name="isUtc"></param>
     /// <returns></returns>
-    internal static unsafe int GetDefaultRavenFormat(
+    internal static unsafe int GetDefaultIronFormat(
         this DateTime dt, 
         JsonOperationContext context, 
         out AllocatedMemoryData memory, 
@@ -328,7 +328,7 @@ public static class IronDateTimeExtensions
         memory = context.GetMemory(size);
 
         var ptr = memory.Address;
-        ProcessDefaultRavenFormat(ticks, ptr);
+        ProcessDefaultIronFormat(ticks, ptr);
 
         if (isUtc)
         {
@@ -345,7 +345,7 @@ public static class IronDateTimeExtensions
     /// <param name="dt"></param>
     /// <param name="isUtc"></param>
     /// <returns></returns>
-    internal static unsafe int GetDefaultRavenFormat(this DateTime dt, byte* ptr, int ptrSize, bool isUtc = false)
+    internal static unsafe int GetDefaultIronFormat(this DateTime dt, byte* ptr, int ptrSize, bool isUtc = false)
     {
         ValidateDate(dt, isUtc);
 
@@ -357,7 +357,7 @@ public static class IronDateTimeExtensions
 
         var ticks = dt.Ticks;
 
-        ProcessDefaultRavenFormat(ticks, ptr);
+        ProcessDefaultIronFormat(ticks, ptr);
 
         if (isUtc)
         {
@@ -386,14 +386,14 @@ public static class IronDateTimeExtensions
 
     private static int ThrowMemoryIsNotBigEnough()
     {
-        throw new ArgumentException($"The memory passed to {nameof(GetDefaultRavenFormat)} is not big enough, we require at least 28 bytes to operate. This exception should never ever happen.");
+        throw new ArgumentException($"The memory passed to {nameof(GetDefaultIronFormat)} is not big enough, we require at least 28 bytes to operate. This exception should never ever happen.");
     }
 
     internal static DateTime ParseDateMicrosoft(string text)
     {
-        var value = text.Substring(6, text.Length - 8);
+        string value = text[6..^2];
 
-        var index = value.IndexOf('+', 1);
+        int index = value.IndexOf('+', 1);
 
         if (index == -1)
         {
