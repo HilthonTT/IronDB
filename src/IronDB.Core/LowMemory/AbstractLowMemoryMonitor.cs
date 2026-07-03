@@ -2,7 +2,7 @@
 
 namespace IronDB.Core.LowMemory;
 
-internal abstract class AbstractLowMemoryMonitor : IDisposable
+public abstract class AbstractLowMemoryMonitor : IDisposable
 {
     public abstract MemoryInfoResult GetMemoryInfoOnce();
 

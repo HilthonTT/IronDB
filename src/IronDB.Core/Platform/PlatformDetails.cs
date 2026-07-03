@@ -4,7 +4,7 @@ using System.Runtime.Versioning;
 
 namespace IronDB.Core.Platform;
 
-internal static class PlatformDetails
+public static class PlatformDetails
 {
     public static readonly bool IsWindows8OrNewer;
 

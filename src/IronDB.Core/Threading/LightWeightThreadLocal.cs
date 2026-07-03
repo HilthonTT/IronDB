@@ -2,7 +2,7 @@
 
 namespace IronDB.Core.Threading;
 
-internal sealed class LightWeightThreadLocal<T> : IDisposable
+public sealed class LightWeightThreadLocal<T> : IDisposable
 {
     [ThreadStatic]
     private static CurrentThreadState? _state;

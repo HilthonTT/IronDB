@@ -7,7 +7,7 @@ using System.Runtime;
 
 namespace IronDB.Core.LowMemory;
 
-internal sealed class LowMemoryNotification
+public sealed class LowMemoryNotification
 {
     private const string NotificationThreadName = "Low memory notification thread";
 

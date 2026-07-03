@@ -9,7 +9,7 @@ using System.Text;
 
 namespace IronDB.Core;
 
-internal static unsafe partial class Hashing
+public static unsafe partial class Hashing
 {
     #region XXHash32 & XXHash64
 
@@ -27,7 +27,7 @@ internal static unsafe partial class Hashing
         char Modify(char ch);
     }
 
-    internal struct OrdinalModifier : ICharacterModifier
+    internal readonly struct OrdinalModifier : ICharacterModifier
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public char Modify(char ch)
@@ -40,7 +40,7 @@ internal static unsafe partial class Hashing
     /// A port of the original XXHash algorithm from Google in 32bits 
     /// </summary>
     /// <remarks>The 32bits and 64bits hashes for the same data are different. In short those are 2 entirely different algorithms</remarks>
-    internal static class XXHash32
+    public static class XXHash32
     {
         // TODO: Check if it is better to have ReadOnlySpan built on top of pointer or the other way around. 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -290,7 +290,7 @@ internal static unsafe partial class Hashing
     /// A port of the original XXHash algorithm from Google in 64bits 
     /// </summary>
     /// <remarks>The 32bits and 64bits hashes for the same data are different. In short those are 2 entirely different algorithms</remarks>
-    internal static class XXHash64
+    public static class XXHash64
     {
         // RavenDB-21728: There are 2 different methods here, one uses span which is limited
         // to the size of the memory we can use. While it's performance characteristics are
@@ -846,7 +846,7 @@ internal static unsafe partial class Hashing
 
     #endregion
 
-    internal static class Marvin32
+    public static class Marvin32
     {
         public static uint Calculate(byte[] buffer, ulong seed = 0x5D70D359C498B3F8ul)
         {

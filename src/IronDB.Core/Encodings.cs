@@ -2,7 +2,7 @@
 
 namespace IronDB.Core;
 
-internal static class Encodings
+public static class Encodings
 {
-    internal static readonly UTF8Encoding Utf8 = new();
+    public static readonly UTF8Encoding Utf8 = new();
 }

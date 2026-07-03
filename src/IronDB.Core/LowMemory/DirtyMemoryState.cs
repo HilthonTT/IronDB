@@ -1,6 +1,6 @@
 ﻿namespace IronDB.Core.LowMemory;
 
-internal sealed class DirtyMemoryState
+public sealed class DirtyMemoryState
 {
     public bool IsHighDirty;
 

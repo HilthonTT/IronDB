@@ -1,6 +1,6 @@
 ﻿namespace IronDB.Core.Utils;
 
-internal static class ThreadLocalCleanup
+public static class ThreadLocalCleanup
 {
     public static event Action ReleaseThreadLocalState = delegate { };
 
