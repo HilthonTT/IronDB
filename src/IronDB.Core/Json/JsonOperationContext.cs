@@ -1282,24 +1282,24 @@ public partial class JsonOperationContext
         get => _sync ??= new SyncJsonOperationContext(this);
     }
 
-    internal sealed class SyncJsonOperationContext
+    public sealed class SyncJsonOperationContext
     {
-        internal readonly JsonOperationContext Context;
+        public readonly JsonOperationContext Context;
 
-        internal SyncJsonOperationContext(JsonOperationContext context)
+        public SyncJsonOperationContext(JsonOperationContext context)
         {
             Context = context;
         }
 
-        internal void EnsureNotDisposed()
+        public void EnsureNotDisposed()
         {
             Context.EnsureNotDisposed();
         }
 
-        internal JsonParserState JsonParserState => Context._jsonParserState;
+        public JsonParserState JsonParserState => Context._jsonParserState;
 
-        internal ObjectJsonParser ObjectJsonParser => Context._objectJsonParser;
+        public ObjectJsonParser ObjectJsonParser => Context._objectJsonParser;
 
-        internal BlittableJsonDocumentBuilder DocumentBuilder => Context._documentBuilder;
+        public BlittableJsonDocumentBuilder DocumentBuilder => Context._documentBuilder;
     }
 }

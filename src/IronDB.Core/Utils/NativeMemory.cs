@@ -13,7 +13,7 @@ public static unsafe class NativeMemory
 {
     public static Func<ulong> GetCurrentUnmanagedThreadId = () => 0xDEAD;
 
-    internal static readonly LightWeightThreadLocal<ThreadStats> ThreadAllocations = new(
+    public static readonly LightWeightThreadLocal<ThreadStats> ThreadAllocations = new(
         () => new ThreadStats());
 
     public static void NotifyCurrentThreadAboutToClose()
@@ -37,7 +37,7 @@ public static unsafe class NativeMemory
         }
     }
 
-    internal static long _totalAllocatedMemory;
+    public static long _totalAllocatedMemory;
     private static long _totalLuceneManagedAllocationsForTermCache;
     private static long _totalLuceneUnmanagedAllocationsForTermCache;
     private static long _totalLuceneUnmanagedAllocationsForSorting;
@@ -220,7 +220,7 @@ public static unsafe class NativeMemory
                                        $"Un-managed memory: {new Size(unmanagedMemory, SizeUnit.Bytes)}", e);
     }
 
-    internal static void UpdateMemoryStatsForThread(ThreadStats stats, long size)
+    public static void UpdateMemoryStatsForThread(ThreadStats stats, long size)
     {
         var currentThreadValue = ThreadAllocations.Value;
         if (currentThreadValue == stats)

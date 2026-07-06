@@ -4,7 +4,7 @@ using static IronDB.Core.Json.JsonOperationContext;
 
 namespace IronDB.Core.Json.Sync;
 
-internal static class JsonOperationSyncExtensions
+public static class JsonOperationSyncExtensions
 {
 #if DEBUG
     private static readonly ConditionalWeakTable<Stream, Stream> SeenWithDifferentBuffer = [];
@@ -43,7 +43,7 @@ internal static class JsonOperationSyncExtensions
         return ParseToMemory(syncContext, stream, documentId, BlittableJsonDocumentBuilder.UsageMode.None);
     }
 
-    internal static BlittableJsonReaderObject ParseToMemory(
+    public static BlittableJsonReaderObject ParseToMemory(
         SyncJsonOperationContext syncContext,
         Stream stream,
         string debugTag, 

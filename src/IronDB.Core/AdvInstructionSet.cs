@@ -138,43 +138,43 @@ public static class AdvInstructionSet
                     IsSupportedAvx512 = false;
                     break;
             }
-        }
+        } 
+    }
 
-        public static class Arm
+    public static class Arm
+    {
+        public static readonly bool IsSupported;
+        public static readonly bool IsSupportedArm64;
+
+        static Arm()
         {
-            public static readonly bool IsSupported;
-            public static readonly bool IsSupportedArm64;
-
-            static Arm()
-            {
 #if NET7_0_OR_GREATER
-                IsSupported = AdvSimd.IsSupported;
-                IsSupportedArm64 = IsSupported & AdvSimd.Arm64.IsSupported;
+            IsSupported = AdvSimd.IsSupported;
+            IsSupportedArm64 = IsSupported & AdvSimd.Arm64.IsSupported;
 #else
                 IsSupported = false;
                 IsSupportedArm64 = false;
 #endif
 
-                if (Environment.GetEnvironmentVariable("IRONDB_AdvInstructions_Disable_Simd")?.ToLowerInvariant() == "true")
-                {
-                    // We are disabling the whole SIMD support (at all levels) and activating fallback mechanisms.
-                    // Some algorithms will not have fallback mechanism and therefore use the vector versions without acceleration.
-                    // When special operations are needed we can switch on and off accordingly.
-                    IsSupported = false;
-                    IsSupportedArm64 = false;
-                }
+            if (Environment.GetEnvironmentVariable("IRONDB_AdvInstructions_Disable_Simd")?.ToLowerInvariant() == "true")
+            {
+                // We are disabling the whole SIMD support (at all levels) and activating fallback mechanisms.
+                // Some algorithms will not have fallback mechanism and therefore use the vector versions without acceleration.
+                // When special operations are needed we can switch on and off accordingly.
+                IsSupported = false;
+                IsSupportedArm64 = false;
+            }
 
-                // We assume for simplicity in the testing matrix and to simplify our life that whenever NEON is used, etc.
-                // This allow us an easier upgrade path for our algorithms without having to rely on a highly complex architecture selector.
-                switch (Environment.GetEnvironmentVariable("IRONDB_AdvInstructions_Disable_Arm_InstSet")?.ToLowerInvariant())
-                {
-                    case "base":
-                        IsSupported = false;
-                        goto case "arm64";
-                    case "arm64":
-                        IsSupportedArm64 = false;
-                        break;
-                }
+            // We assume for simplicity in the testing matrix and to simplify our life that whenever NEON is used, etc.
+            // This allow us an easier upgrade path for our algorithms without having to rely on a highly complex architecture selector.
+            switch (Environment.GetEnvironmentVariable("IRONDB_AdvInstructions_Disable_Arm_InstSet")?.ToLowerInvariant())
+            {
+                case "base":
+                    IsSupported = false;
+                    goto case "arm64";
+                case "arm64":
+                    IsSupportedArm64 = false;
+                    break;
             }
         }
     }

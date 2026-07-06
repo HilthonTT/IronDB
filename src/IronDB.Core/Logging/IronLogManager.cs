@@ -3,7 +3,7 @@
 public sealed class IronLogManager
 {
     internal static bool GlobalIsAuditEnabled = false;
-    internal static readonly IronLogManager Instance = new();
+    public static readonly IronLogManager Instance = new();
 
     private static IIronLogManager _logManager = IronNullLogManager.Instance;
 

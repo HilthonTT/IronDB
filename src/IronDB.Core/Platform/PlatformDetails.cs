@@ -124,7 +124,7 @@ public static class PlatformDetails
         return false;
     }
 
-    internal static string? GetVcRedistLink()
+    public static string? GetVcRedistLink()
     {
         if (!RunningOnWindows)
         {

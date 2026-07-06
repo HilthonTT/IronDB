@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace IronDB.Core.Utils;
 
 #if NETCOREAPP3_1_OR_GREATER
-internal static class DynamicNativeLibraryResolver
+public static class DynamicNativeLibraryResolver
 {
     private static Dictionary<string, Func<string, string>?> _registered = [];
     private static readonly HashSet<Assembly> _registeredAssemblies = [];

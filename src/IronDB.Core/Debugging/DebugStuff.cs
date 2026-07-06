@@ -2,11 +2,11 @@
 
 namespace IronDB.Core.Debugging;
 
-internal static class DebugStuff
+public static class DebugStuff
 {
     public static IElectricFencedMemory ElectricFencedMemory = default!;
 
-    internal interface IElectricFencedMemory
+    public interface IElectricFencedMemory
     {
         void IncrementContext();
 

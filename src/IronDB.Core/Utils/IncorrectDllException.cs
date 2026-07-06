@@ -1,6 +1,6 @@
 ﻿namespace IronDB.Core.Utils;
 
-internal sealed class IncorrectDllException : Exception
+public sealed class IncorrectDllException : Exception
 {
     public IncorrectDllException()
     {
