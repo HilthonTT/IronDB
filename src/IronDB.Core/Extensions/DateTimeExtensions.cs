@@ -5,7 +5,7 @@ using IronDB.Core.Json;
 
 namespace IronDB.Core.Extensions;
 
-public static class IronDateTimeExtensions
+public static class DateTimeExtensions
 {
     private const long InitialJavaScriptDateTicks = 621355968000000000;
 
@@ -187,7 +187,7 @@ public static class IronDateTimeExtensions
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static unsafe void ProcessDefaultIronFormat(long ticks, byte* chars)
+    public static unsafe void ProcessDefaultIronFormat(long ticks, byte* chars)
     {
         // n = number of days since 1/1/0001
         int n = (int)(ticks / TicksPerDay);
@@ -371,7 +371,7 @@ public static class IronDateTimeExtensions
     }
 
     [Conditional("DEBUG")]
-    internal static void ValidateDate(DateTime dt, bool isUtc)
+    public static void ValidateDate(DateTime dt, bool isUtc)
     {
         if (dt.Kind == DateTimeKind.Utc && isUtc == false)
         {
