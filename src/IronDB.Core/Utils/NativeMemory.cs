@@ -132,7 +132,7 @@ public static unsafe class NativeMemory
         Marshal.FreeHGlobal((IntPtr)ptr);
     }
 
-    public static void Free(byte* ptr, long size, ThreadStats stats)
+    public static void Free(byte* ptr, long size, ThreadStats? stats)
     {
         Free(ptr, size);
 
@@ -220,7 +220,7 @@ public static unsafe class NativeMemory
                                        $"Un-managed memory: {new Size(unmanagedMemory, SizeUnit.Bytes)}", e);
     }
 
-    public static void UpdateMemoryStatsForThread(ThreadStats stats, long size)
+    public static void UpdateMemoryStatsForThread(ThreadStats? stats, long size)
     {
         var currentThreadValue = ThreadAllocations.Value;
         if (currentThreadValue == stats)
