@@ -1,0 +1,6 @@
+﻿namespace IronDB.Core.Server.Platform.Posix;
+
+internal interface ISmapsReaderResultAction
+{
+    void Add(SmapsReaderResults results);
+}
