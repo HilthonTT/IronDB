@@ -28,10 +28,10 @@ internal struct vm_statistics64
      */
     uint speculative_count; /* # of pages speculative */
 
-    public uint FreePagesCount => free_count;
-    public uint ActivePagesCount => active_count;
-    public uint InactivePagesCount => inactive_count;
-    public uint WirePagesCount => wire_count;
-    public uint SpeculativePagesCount => speculative_count;
-    public uint PurgeablePagesCount => purgeable_count;
+    public readonly uint FreePagesCount => free_count;
+    public readonly uint ActivePagesCount => active_count;
+    public readonly uint InactivePagesCount => inactive_count;
+    public readonly uint WirePagesCount => wire_count;
+    public readonly uint SpeculativePagesCount => speculative_count;
+    public readonly uint PurgeablePagesCount => purgeable_count;
 }
