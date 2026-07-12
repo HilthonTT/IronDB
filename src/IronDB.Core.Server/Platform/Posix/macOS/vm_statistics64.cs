@@ -1,5 +1,10 @@
 ﻿namespace IronDB.Core.Server.Platform.Posix.macOS;
 
+// Native layout: fields are written by host_statistics64(). The unread fields must stay
+// declared so the fields after them keep their correct byte offsets.
+#pragma warning disable CS0649 // never assigned to
+#pragma warning disable CS0169 // never used
+
 internal struct vm_statistics64
 {
     uint free_count;        /* # of pages free */
@@ -35,3 +40,6 @@ internal struct vm_statistics64
     public readonly uint SpeculativePagesCount => speculative_count;
     public readonly uint PurgeablePagesCount => purgeable_count;
 }
+
+#pragma warning restore CS0169
+#pragma warning restore CS0649
