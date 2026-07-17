@@ -1,0 +1,222 @@
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace IronDB.StorageEngine.Utils;
+
+/// <summary>
+/// Assumptions:
+/// * Only single writer 
+/// * Write operations can be very long ( involves I/O )
+/// * Many readers
+/// * Writer waiting should stop additional readers from entering
+/// * Entering & exiting the read lock can happen in different threads (no thread affinity)
+/// * Write lock is always on the same thread
+/// </summary>
+public sealed class ThreadHoppingReaderWriterLock
+{
+    private const uint ReaderMask = 0x00FFFFFF;
+    private const int WriterMarker = 0x01000000;
+    private int _waiters;
+
+    private SpinLock _readWaitLock = new();
+    private readonly ManualResetEventSlim _readerWait = new(false);
+    private readonly AutoResetEvent _writerWait = new(false);
+    private int _writeLockOwnerThreadId;
+
+    public void EnterWriteLock()
+    {
+        var currentWaiters = Interlocked.Add(ref _waiters, WriterMarker);
+
+        int managedThreadId = Environment.CurrentManagedThreadId;
+        // try take ownership on lock
+        var currentLock = Interlocked.CompareExchange(ref _writeLockOwnerThreadId, managedThreadId, 0);
+
+        while ((currentWaiters & ReaderMask) == 0 && currentLock != 0)
+        {
+            // we have readers, so we have to wait on them :-(
+            _writerWait.WaitOne();
+            currentWaiters = Volatile.Read(ref _waiters);
+            currentLock = Interlocked.CompareExchange(ref _writeLockOwnerThreadId, managedThreadId, 0);
+        }
+    }
+
+    public bool IsWriteLockHeld => Environment.CurrentManagedThreadId == Volatile.Read(ref _writeLockOwnerThreadId);
+
+    public void ExitWriteLock()
+    {
+        if (!IsWriteLockHeld)
+        {
+            ThrowInvalidWriteLockRelease();
+        }
+
+        Interlocked.Add(ref _waiters, -WriterMarker); // remove the write marker for this lock
+        Interlocked.Exchange(ref _writeLockOwnerThreadId, 0); // remove ownering of lock
+        _readerWait.Set();
+        _writerWait.Set();
+    }
+
+    public bool TryEnterReadLock(TimeSpan timeout)
+    {
+        return TryEnterReadLock((int)timeout.TotalMilliseconds);
+    }
+
+    public bool TryEnterReadLock(int timeout)
+    {
+        if (TryEnterReadLockCore())
+        {
+            return true;
+        }
+
+        return TryEnterReadLockSlow(timeout);
+    }
+
+    [DoesNotReturn]
+    private static void ThrowTooManyReaders(ulong waiters)
+    {
+        throw new InvalidOperationException(
+            $"Too many readers, we got {waiters} readers, possible read lock leak");
+    }
+
+    [DoesNotReturn]
+    private static void ThrowInvalidWriteLockRelease()
+    {
+        throw new InvalidOperationException("Attempt to release write lock that isn't being held");
+    }
+
+    private bool TryEnterReadLockSlow(int timeout)
+    {
+        var tracker = new TimeoutTracker(timeout);
+        while (!tracker.IsExpired)
+        {
+            bool lockTaken = false;
+            _readWaitLock.TryEnter(tracker.RemainingMilliseconds, ref lockTaken);
+
+            try
+            {
+                if (!lockTaken)
+                {
+                    return false;
+                }
+
+                ForTestingPurposes?.BeforeResetOfReaderWait?.Invoke();
+
+                if (_readerWait.IsSet)
+                {
+                    _readerWait.Reset();
+                }
+
+                if (TryEnterReadLockCore())
+                {
+                    // we got the reader lock, that means that no writer can acquire it.
+                    // since there might be other readers that are waiting on the _readerWait,
+                    // we need to signal them (and we are the only ones that can do that).
+                    _readerWait.Set();
+                    return true;
+                }
+            }
+            finally
+            {
+                if (lockTaken)
+                {
+                    _readWaitLock.Exit(false);
+                }
+            }
+
+            ForTestingPurposes?.BeforeReaderWriterWait?.Invoke();
+
+            _readerWait.Wait(tracker.RemainingMilliseconds);
+
+            if (TryEnterReadLockCore())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void ExitReadLock()
+    {
+        var waiters = Interlocked.Decrement(ref _waiters);
+        if ((waiters & ~ReaderMask) != 0)
+        {
+            _writerWait.Set();
+        }
+    }
+
+    private bool TryEnterReadLockCore()
+    {
+        var waiters = (uint)Interlocked.Increment(ref _waiters);
+        if ((waiters & ~ReaderMask) != 0) // there is a writer
+        {
+            ExitReadLock();
+            return false;
+        }
+
+        if (waiters > ReaderMask / 2)
+        {
+            ExitReadLock();
+            ThrowTooManyReaders(waiters);
+        }
+
+        return true;
+    }
+
+    private readonly struct TimeoutTracker
+    {
+        private readonly int _total;
+        private readonly int _start;
+
+        public TimeoutTracker(int millisecondsTimeout)
+        {
+            ArgumentOutOfRangeException.ThrowIfLessThan(millisecondsTimeout, -1, nameof(millisecondsTimeout));
+
+            _total = millisecondsTimeout;
+            if (_total != -1 && _total != 0)
+            {
+                _start = Environment.TickCount;
+            }
+            else
+            {
+                _start = 0;
+            }
+        }
+
+        public readonly int RemainingMilliseconds
+        {
+            get
+            {
+                if (_total == -1 || _total == 0)
+                {
+                    return _total;
+                }
+
+                int elapsed = Environment.TickCount - _start;
+                // elapsed may be negative if TickCount has overflowed by 2^31 milliseconds.
+                if (elapsed < 0 || elapsed >= _total)
+                    return 0;
+
+                return _total - elapsed;
+            }
+        }
+
+        public readonly bool IsExpired => RemainingMilliseconds == 0;
+    }
+
+    internal TestingStuff? ForTestingPurposes { get; set; }
+
+    internal TestingStuff ForTestingPurposesOnly()
+    {
+        if (ForTestingPurposes is not null)
+        {
+            return ForTestingPurposes;
+        }
+
+        return ForTestingPurposes = new TestingStuff();
+    }
+
+    internal sealed class TestingStuff
+    {
+        internal Action? BeforeResetOfReaderWait { get; set; }
+        internal Action? BeforeReaderWriterWait { get; set; }
+    }
+}

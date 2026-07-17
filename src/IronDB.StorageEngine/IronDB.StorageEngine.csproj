@@ -1,5 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<ItemGroup>
+    <ProjectReference Include="..\IronDB.Core.Server\IronDB.Core.Server.csproj" />
     <ProjectReference Include="..\IronDB.Core\IronDB.Core.csproj" />
   </ItemGroup>
 </Project>

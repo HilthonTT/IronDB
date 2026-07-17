@@ -9,7 +9,7 @@ namespace IronDB.Core.Server.Unmanaged;
 
 public unsafe struct ByteString : IEquatable<ByteString>
 {
-    internal ByteStringStorage* _pointer;
+    public ByteStringStorage* _pointer;
 
 #if VALIDATE
         internal ByteString(ByteStringStorage* ptr)

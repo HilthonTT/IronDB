@@ -1,0 +1,13 @@
+﻿namespace IronDB.StorageEngine;
+
+public sealed class DataIntegrityErrorEventArgs : EventArgs
+{
+    internal DataIntegrityErrorEventArgs(string message, Exception exception)
+    {
+        Message = message;
+        Exception = exception;
+    }
+
+    public string Message { get; private set; }
+    public Exception Exception { get; private set; }
+}

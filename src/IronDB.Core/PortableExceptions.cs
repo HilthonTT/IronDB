@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 
 namespace IronDB.Core;
 
-internal sealed class PortableExceptions
+public sealed class PortableExceptions
 {
 
 #if NET6_0_OR_GREATER         
