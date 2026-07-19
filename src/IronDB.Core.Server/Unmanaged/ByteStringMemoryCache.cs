@@ -40,10 +40,8 @@ public unsafe struct ByteStringMemoryCache : IByteStringAllocator
             return;
         }
 
-        StackNode<UnmanagedGlobalSegment>? stackHead = stack.Head;
-
         _minSize = 0;
-        var current = Interlocked.Exchange(ref stackHead, null);
+        var current = Interlocked.Exchange(ref stack.Head, null);
         while (current is not null)
         {
             current.Value?.Dispose();
@@ -58,17 +56,17 @@ public unsafe struct ByteStringMemoryCache : IByteStringAllocator
             _minSize = size;
         }
 
-        var stack = SegmentsPool.Value;
+        var stack = SegmentsPool.Value!;
 
         while (true)
         {
-            StackNode<UnmanagedGlobalSegment>? current = stack?.Head;
+            StackNode<UnmanagedGlobalSegment>? current = stack.Head;
             if (current is null)
             {
                 break;
             }
 
-            if (Interlocked.CompareExchange(ref current, current.Next, current) != current)
+            if (Interlocked.CompareExchange(ref stack.Head, current.Next, current) != current)
             {
                 continue;
             }
@@ -122,15 +120,14 @@ public unsafe struct ByteStringMemoryCache : IByteStringAllocator
         memory.InUse.Lower();
         memory.InPoolSince = DateTime.UtcNow;
 
-        var stack = SegmentsPool.Value;
+        var stack = SegmentsPool.Value!;
 
         while (true)
         {
-            StackNode<UnmanagedGlobalSegment>? current = stack?.Head;
-            var stackHead = stack?.Head;
+            StackNode<UnmanagedGlobalSegment>? current = stack.Head;
 
             var newHead = new StackNode<UnmanagedGlobalSegment> { Value = memory, Next = current };
-            if (Interlocked.CompareExchange(ref stackHead, newHead, current) == current)
+            if (Interlocked.CompareExchange(ref stack.Head, newHead, current) == current)
             {
                 return;
             }

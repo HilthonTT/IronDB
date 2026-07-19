@@ -94,6 +94,7 @@ public sealed class DisposeOnce<TOperationMode> : IDisposable
             try
             {
                 _action();
+                localState.Item2.SetResult(default!);
             }
             catch (Exception ex)
             {

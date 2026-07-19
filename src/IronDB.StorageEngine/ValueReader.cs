@@ -75,7 +75,7 @@ public unsafe struct ValueReader(byte* val, int len)
     public T ReadStructure<T>()
         where T : unmanaged
     {
-        if (_len - _pos < sizeof(int))
+        if (_len - _pos < sizeof(T))
         {
             throw new EndOfStreamException();
         }

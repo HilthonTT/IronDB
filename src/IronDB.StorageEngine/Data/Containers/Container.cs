@@ -20,7 +20,9 @@ public readonly unsafe ref struct Container
         public Dictionary<long, long> LastFreePageByPageLevelMetadata = [];
 
         public ContainerId ContainerId = containerId;
+#pragma warning disable CS0169 // fields are placeholders until the container implementation lands
         private Lookup<Int64LookupKey>? _allPages;
         private Lookup<Int64LookupKey>? _freePages;
+#pragma warning restore CS0169
     }
 }

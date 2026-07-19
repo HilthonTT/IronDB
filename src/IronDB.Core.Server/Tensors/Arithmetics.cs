@@ -73,7 +73,7 @@ public static class Arithmetics
 
                 var upperS = Fma.MultiplyAdd(fx.GetUpper(), fy.GetUpper(), fz.GetUpper());
                 var lowerS = Fma.MultiplyAdd(fx.GetLower(), fy.GetLower(), fz.GetLower());
-                return Vector512.Create(upperS, lowerS).As<float, T>();
+                return Vector512.Create(lowerS, upperS).As<float, T>();
             }
 
             if (typeof(T) == typeof(double))
@@ -84,7 +84,7 @@ public static class Arithmetics
 
                 var upperS = Fma.MultiplyAdd(dx.GetUpper(), dy.GetUpper(), dz.GetUpper());
                 var lowerS = Fma.MultiplyAdd(dx.GetLower(), dy.GetLower(), dz.GetLower());
-                return Vector512.Create(upperS, lowerS).As<double, T>();
+                return Vector512.Create(lowerS, upperS).As<double, T>();
             }
         }
 #endif

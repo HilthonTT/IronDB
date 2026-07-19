@@ -275,8 +275,10 @@ public sealed class FastList<T> : IList<T>
         {
             return;
         }
-    }
 #endif
+
+        Array.Clear(_items, (int)_size, count);
+    }
 
     public void Trim(int size)
     {

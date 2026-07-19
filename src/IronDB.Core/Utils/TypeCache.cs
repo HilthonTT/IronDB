@@ -13,14 +13,12 @@ internal sealed class TypeCache<T>(int size)
     {
         Unsafe.SkipInit(out result);
 
-        int typeHash = type.GetHashCode();
-
         // We get the data and after that we always work from there to avoid harmful race conditions.
-        // 
+        //
         // The new design emphasizes minimal synchronization overhead.
         // We do direct index lookups and only check a single or small list of items for collisions.
         // This drastically reduces contention compared to a dictionary-based approach.
-        FastList<Tuple<Type, T>>? storage = _buckets[typeHash % _size];
+        FastList<Tuple<Type, T>>? storage = _buckets[GetBucket(type)];
         if (storage is null)
         {
             return false;

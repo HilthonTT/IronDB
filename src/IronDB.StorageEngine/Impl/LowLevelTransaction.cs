@@ -15,8 +15,10 @@ public sealed unsafe class LowLevelTransaction : IPagerLevelTransactionState
 
     public bool IsWriteTransaction => throw new NotImplementedException();
 
+#pragma warning disable CS0067 // events are raised once commit/dispose are implemented
     public event Action<IPagerLevelTransactionState>? OnDispose;
     public event Action<IPagerLevelTransactionState>? BeforeCommitFinalization;
+#pragma warning restore CS0067
 
     public void Dispose()
     {

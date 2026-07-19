@@ -69,6 +69,9 @@ public sealed class TcpConnectionMonitor
             AnalyzeConnection(connection);
         }
 
+        _sentTotal += _sentSinceLastRun;
+        _receivedTotal += _receivedSinceLastRun;
+
         var stats = new TcpStats(connections.Length,
             _sentTotal,
             _receivedTotal,
@@ -116,12 +119,9 @@ public sealed class TcpConnectionMonitor
         _sentSinceLastRun += totalBytesSent - connectionData.LastTotalBytesSent;
         _receivedSinceLastRun += totalBytesReceived - connectionData.LastTotalBytesReceived;
 
-        _sentTotal += _sentSinceLastRun;
-        _receivedTotal += _receivedSinceLastRun;
-
         _pendingSendOnLastRun += pendingSend;
         _inSendOnLastRun += inSend;
-        _pendingReceivedOnLastRun = pendingReceived;
+        _pendingReceivedOnLastRun += pendingReceived;
 
         connectionData.LastTotalBytesSent = totalBytesSent;
         connectionData.LastTotalBytesReceived = totalBytesReceived;

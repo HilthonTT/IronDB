@@ -30,7 +30,7 @@ public sealed class ThreadHoppingReaderWriterLock
         // try take ownership on lock
         var currentLock = Interlocked.CompareExchange(ref _writeLockOwnerThreadId, managedThreadId, 0);
 
-        while ((currentWaiters & ReaderMask) == 0 && currentLock != 0)
+        while ((currentWaiters & ReaderMask) != 0 || (currentLock != 0 && currentLock != managedThreadId))
         {
             // we have readers, so we have to wait on them :-(
             _writerWait.WaitOne();

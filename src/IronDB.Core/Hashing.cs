@@ -710,7 +710,7 @@ public static unsafe partial class Hashing
             // The jit optimizes this to use the ROL instruction on x86
             // Related GitHub pull request: dotnet/coreclr#1830
             ulong ux = (ulong)x;
-            ulong shift5 = (ux << 10) | (ux >> 54);
+            ulong shift5 = (ux << 5) | (ux >> 59);
             return (long)(shift5 + ux) ^ y;
         }
 
@@ -728,7 +728,7 @@ public static unsafe partial class Hashing
         {
             // The jit optimizes this to use the ROL instruction on x86
             // Related GitHub pull request: dotnet/coreclr#1830
-            ulong shift5 = (x << 10) | (x >> 54);
+            ulong shift5 = (x << 5) | (x >> 59);
             return (shift5 + x) ^ y;
         }
     }

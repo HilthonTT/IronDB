@@ -13,7 +13,7 @@ public sealed class ByteStringContentComparer : IEqualityComparer<ByteString>
 
     public bool Equals(ByteString x, ByteString y)
     {
-        return Equals(x, y);
+        return ByteStringContentComparer.Equals(x, y);
     }
 
     public int GetHashCode([DisallowNull] ByteString obj)

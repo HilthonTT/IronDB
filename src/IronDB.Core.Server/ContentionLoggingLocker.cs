@@ -28,7 +28,7 @@ public sealed class ContentionLoggingLocker(IIronLogger logger, string name)
         [CallerMemberName] string? caller = null, 
         [CallerLineNumber] int line = 0)
     {
-        _lockTaken = true;
+        _lockTaken = false;
         Monitor.TryEnter(_locker, 0, ref _lockTaken);
 
         if (!_lockTaken)

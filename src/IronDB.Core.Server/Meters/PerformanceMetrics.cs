@@ -24,7 +24,7 @@ public abstract class PerformanceMetrics
         public long Count;
     }
 
-    protected readonly MeterItem[] Buffer;
+    protected readonly MeterItem?[] Buffer;
     protected long BufferPos = -1;
 
     private readonly SummerizedItem[] _summerizedBuffer;
@@ -53,9 +53,9 @@ public abstract class PerformanceMetrics
 
         for (int i = 0; i < Buffer.Length; i++)
         {
-            MeterItem meter = Buffer[(adjustedTail + i) % Buffer.Length];
+            int index = (adjustedTail + i) % Buffer.Length;
 
-            var oldVal = Interlocked.Exchange(ref meter!, null);
+            var oldVal = Interlocked.Exchange(ref Buffer[index], null);
             if (oldVal is not null)
             {
                 newSummary.TotalTimeStart = newSummary.TotalTimeStart > oldVal.Start ? oldVal.Start : newSummary.TotalTimeStart;

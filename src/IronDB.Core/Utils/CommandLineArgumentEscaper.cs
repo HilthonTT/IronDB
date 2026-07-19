@@ -79,7 +79,7 @@ internal static class CommandLineArgumentEscaper
             return false;
         }
 
-        return argument[0] == '"' && argument[^(-1)] == '"';
+        return argument[0] == '"' && argument[^1] == '"';
     }
 
     private static bool ContainsWhitespace(string argument)

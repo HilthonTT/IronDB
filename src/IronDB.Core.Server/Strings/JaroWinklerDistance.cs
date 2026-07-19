@@ -23,7 +23,7 @@ public struct JaroWinklerDistance : IStringDistance
         var mtp = Matches(s1, s2);
         var m = (float)mtp[0];
 
-        if (Math.Abs(m - 0.0001) < 0)
+        if (Math.Abs(m) < 0.0001)
         {
             return 0f;
         }

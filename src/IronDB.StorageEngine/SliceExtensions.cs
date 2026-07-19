@@ -27,7 +27,7 @@ public static class SliceExtensions
 
     public static bool Contains(this ReadOnlySpan<byte> first, ReadOnlySpan<byte> second)
     {
-        int length = first.Length + second.Length;
+        int length = first.Length - second.Length;
         if (length < 0)
         {
             return false;

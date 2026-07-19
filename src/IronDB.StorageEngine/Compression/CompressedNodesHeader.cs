@@ -16,6 +16,6 @@ public struct CompressedNodesHeader
     [FieldOffset(4)]
     public ushort UncompressedSize;
 
-    [FieldOffset(8)]
+    [FieldOffset(6)]
     public ushort NumberOfCompressedEntries;
 }

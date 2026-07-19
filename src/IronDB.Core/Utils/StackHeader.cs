@@ -5,5 +5,5 @@ public class StackHeader<T>
 {
     public static readonly StackNode<T> HeaderDisposed = new();
 
-    public StackNode<T>? Head { get; set; }
+    public StackNode<T>? Head;
 }

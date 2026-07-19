@@ -154,7 +154,7 @@ public unsafe struct Encoder3Gram<TEncoderState> : IEncoderAlgorithm
                     bits -= length;
                 }
 
-                outputSize[i] = buffer.Length - buffer.Length;
+                outputSize[i] = outputBuffers[i].Length - buffer.Length;
             }
         }
     }
@@ -180,13 +180,12 @@ public unsafe struct Encoder3Gram<TEncoderState> : IEncoderAlgorithm
 
             for (int i = 0; i < data.Length; i++)
             {
-                Span<byte> buffer = default;
+                Span<byte> buffer = outputBuffers[i];
                 var reader = new BitReader(data[i]);
                 int bits = dataBits[i];
                 var endsWithNull = false;
                 while (bits > 0 && endsWithNull == false)
                 {
-                    buffer = outputBuffers[i];
                     int length = Lookup(reader, ref buffer, table, tree, out endsWithNull);
                     if (length < 0)
                         throw new IOException("Invalid data stream.");
@@ -197,7 +196,7 @@ public unsafe struct Encoder3Gram<TEncoderState> : IEncoderAlgorithm
                     bits -= length;
                 }
 
-                outputSize[i] = buffer.Length - buffer.Length;
+                outputSize[i] = outputBuffers[i].Length - buffer.Length;
             }
         }
     }

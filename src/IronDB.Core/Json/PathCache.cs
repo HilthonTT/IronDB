@@ -53,7 +53,7 @@ internal sealed class PathCache
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void ClearUnreturnedPathCache()
     {
-        for (var i = _used; i <= _items.Length; i++)
+        for (var i = _used + 1; i < _items.Length; i++)
         {
             var cache = _items[i];
 

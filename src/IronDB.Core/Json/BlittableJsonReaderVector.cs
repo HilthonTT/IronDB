@@ -187,7 +187,7 @@ public sealed unsafe class BlittableJsonReaderVector : BlittableJsonReaderBase
                 BlittableVectorType.SByte => &SbyteConverter,
                 BlittableVectorType.Int16 => &Int16Converter,
                 BlittableVectorType.Int32 => &Int32Converter,
-                BlittableVectorType.Int64 => &UInt64Converter,
+                BlittableVectorType.Int64 => &Int64Converter,
 
                 BlittableVectorType.Byte => &ByteConverter,
                 BlittableVectorType.UInt16 => &UInt16Converter,
@@ -399,7 +399,42 @@ public sealed unsafe class BlittableJsonReaderVector : BlittableJsonReaderBase
 
         private static TOut Int32Converter(byte* data)
         {
-            var value = Unsafe.ReadUnaligned<uint>(data);
+            var value = Unsafe.ReadUnaligned<int>(data);
+
+
+            if (typeof(TOut) == typeof(sbyte))
+                return (TOut)(object)Convert.ToSByte(value);
+            if (typeof(TOut) == typeof(short))
+                return (TOut)(object)Convert.ToInt16(value);
+            if (typeof(TOut) == typeof(int))
+                return (TOut)(object)Convert.ToInt32(value);
+            if (typeof(TOut) == typeof(long))
+                return (TOut)(object)Convert.ToInt64(value);
+
+            if (typeof(TOut) == typeof(byte))
+                return (TOut)(object)Convert.ToByte(value);
+            if (typeof(TOut) == typeof(ushort))
+                return (TOut)(object)Convert.ToUInt16(value);
+            if (typeof(TOut) == typeof(uint))
+                return (TOut)(object)Convert.ToUInt32(value);
+            if (typeof(TOut) == typeof(ulong))
+                return (TOut)(object)Convert.ToUInt64(value);
+
+            if (typeof(TOut) == typeof(float))
+                return (TOut)(object)Convert.ToSingle(value);
+            if (typeof(TOut) == typeof(double))
+                return (TOut)(object)Convert.ToDouble(value);
+#if NET6_0_OR_GREATER
+            if (typeof(TOut) == typeof(Half))
+                return (TOut)(object)(Half)Convert.ToSingle(value);
+#endif
+
+            return (TOut)(object)value;
+        }
+
+        private static TOut Int64Converter(byte* data)
+        {
+            var value = Unsafe.ReadUnaligned<long>(data);
 
 
             if (typeof(TOut) == typeof(sbyte))
@@ -539,7 +574,7 @@ public sealed unsafe class BlittableJsonReaderVector : BlittableJsonReaderBase
             if (typeof(TOut) == typeof(float))
                 return (TOut)(object)(float)value;
 
-            if (typeof(TOut) == typeof(float))
+            if (typeof(TOut) == typeof(double))
                 return (TOut)(object)(double)value;
 
             return (TOut)(object)value;

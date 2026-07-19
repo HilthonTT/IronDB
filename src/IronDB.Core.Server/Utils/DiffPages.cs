@@ -79,32 +79,32 @@ public sealed unsafe class DiffPages
             }
 
             start = i + 4;
-
-            if (start == len)
-            {
-                return;
-            }
-
-            long length = (len - start) * sizeof(long);
-            if (OutputSize + (allZeros ? 0 : length) + sizeof(long) * 2 > size)
-            {
-                goto CopyFull;
-            }
-
-            if (allZeros)
-            {
-                WriteDiffAllZeroes(start * sizeof(long), length);
-            }
-            else
-            {
-                WriteDiffNonZeroes(start * sizeof(long), length, (byte*)modifiedBuffer);
-            }
-
-            return;
-
-        CopyFull:
-            CopyFullBuffer((byte*)modifiedBuffer, size);
         }
+
+        if (start == len)
+        {
+            return;
+        }
+
+        long length = (len - start) * sizeof(long);
+        if (OutputSize + (allZeros ? 0 : length) + sizeof(long) * 2 > size)
+        {
+            goto CopyFull;
+        }
+
+        if (allZeros)
+        {
+            WriteDiffAllZeroes(start * sizeof(long), length);
+        }
+        else
+        {
+            WriteDiffNonZeroes(start * sizeof(long), length, (byte*)modifiedBuffer);
+        }
+
+        return;
+
+    CopyFull:
+        CopyFullBuffer((byte*)modifiedBuffer, size);
     }
 
     public void ComputeNew(void* modifiedBuffer, int size)

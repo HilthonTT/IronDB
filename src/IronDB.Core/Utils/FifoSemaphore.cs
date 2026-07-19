@@ -92,7 +92,7 @@ internal sealed class FifoSemaphore
                 else
                 {
                     // We've got no one waiting, so add a token
-                    _tokens--;
+                    _tokens++;
                 }
             }
         }

@@ -55,7 +55,7 @@ public class BufferPool : IDisposable
         get
         {
             CheckDisposed();
-            if (index < 0 || index > _length)
+            if (index < 0 || index >= _length)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
