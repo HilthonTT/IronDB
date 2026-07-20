@@ -1,0 +1,367 @@
+﻿using IronDB.Core;
+using IronDB.Core.Binary;
+using IronDB.Core.Server.Unmanaged;
+using IronDB.Core.Server.Utils.VxSort;
+using System.Collections;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
+namespace IronDB.StorageEngine.Utils;
+
+/// <summary>
+/// NativeList of T is a very low level primitive where you have to deal with the context as an external entity (correctness is on the caller's hands).
+/// ContextBoundNativeList of T is the high level primitive that should be used for most uses and purposes. For example, there are cases where the
+/// NativeList has to contain other native lists, therefore, the requirement of NativeList of T to be completely unmanaged is important for those uses.
+/// </summary>
+public unsafe struct NativeList<T>
+    where T : unmanaged
+{
+    // We're using ByteStringContext to allocate the underlying storage, and we've to take into account the overhead of the metadata.
+    internal static readonly int MaxCapacity = (int.MaxValue - sizeof(ByteStringStorage)) / sizeof(T);
+    private static readonly int MaxCapacityInBytes = MaxCapacity * sizeof(T);
+    private ByteString _storage;
+
+    public readonly T* RawItems => Capacity > 0 ? (T*)_storage.Ptr : null;
+
+    public readonly Span<T> Items => new(_storage.Ptr, Count);
+
+    public int Capacity = 0;
+
+#if DEBUG
+    private bool _disposed = false;
+    private int _count = 0;
+    public int Count
+    {
+        readonly get
+        {
+            Debug.Assert(_count <= Capacity, "NativeList count is greater than capacity.");
+            Debug.Assert(!_disposed, "NativeList has been disposed.");
+            return _count;
+        }
+        set
+        {
+            _count = value;
+        }
+    }
+#else
+    public int Count;
+#endif
+
+    public readonly Span<T> ToSpan() => Count == 0 ? [] : new Span<T>(_storage.Ptr, Count);
+
+    public readonly bool IsValid => RawItems != null;
+
+    public NativeList()
+    {
+        _storage = default;
+    }
+
+    public readonly ref T this[int index]
+    {
+        get
+        {
+            Debug.Assert(index >= 0 && index < Count, "index >= 0 && index < Count");
+            return ref Unsafe.AsRef<T>((T*)_storage.Ptr + index);
+        }
+    }
+
+    public bool TryAdd(in T l)
+    {
+        if (Capacity == 0 || Count == Capacity)
+        {
+            return false;
+        }
+
+        RawItems[Count++] = l;
+        return true;
+    }
+
+    public bool TryAddRange(ReadOnlySpan<T> values)
+    {
+        if (Count + values.Length < Capacity)
+        {
+            values.CopyTo(new Span<T>(RawItems + Count, Capacity - Count));
+            Count += values.Length;
+            return true;
+        }
+
+        return false;
+    }
+
+    public void Add(ByteStringContext ctx, T value)
+    {
+        EnsureCapacityFor(ctx, 1);
+        AddUnsafe(value);
+    }
+
+    public void InitializeWithValue(ByteStringContext allocator, T value, int count)
+    {
+        EnsureCapacityFor(allocator, count);
+        if (Capacity == 0)
+        {
+            return;
+        }
+
+        Count = count;
+        ToSpan().Fill(value);
+    }
+
+    public void ResetAndCopyFrom(ByteStringContext allocator, Span<T> src)
+    {
+        ResetAndEnsureCapacity(allocator, src.Length);
+        AddRangeUnsafe(src);
+    }
+
+    public void ResetAndCopyFrom(ByteStringContext allocator, ReadOnlySpan<T> src)
+    {
+        ResetAndEnsureCapacity(allocator, src.Length);
+        AddRangeUnsafe(src);
+    }
+
+    public void AddRangeUnsafe(ReadOnlySpan<T> range)
+    {
+        Debug.Assert(Count + range.Length <= Capacity);
+        Debug.Assert((uint)(range.Length * sizeof(T)) > (uint)range.Length || range.Length == 0);
+
+        Unsafe.CopyBlockUnaligned(
+            ref Unsafe.AsRef<byte>(RawItems + Count),
+            ref MemoryMarshal.GetReference(MemoryMarshal.Cast<T, byte>(range)),
+            (uint)(range.Length * sizeof(T)));
+
+        Count += range.Length;
+    }
+
+    public void AddRangeUnsafe(T* items, int count)
+    {
+        Debug.Assert(Count + count <= Capacity);
+        Debug.Assert((uint)(count * sizeof(T)) > (uint)count || count == 0);
+
+        Unsafe.CopyBlock(RawItems + Count, items, (uint)(count * sizeof(T)));
+        Count += count;
+    }
+
+    public void AddUnsafe(in T l)
+    {
+        Debug.Assert(Count < Capacity);
+        RawItems[Count++] = l;
+    }
+
+    public ref T AddByRefUnsafe()
+    {
+        Debug.Assert(Count < Capacity);
+        return ref RawItems[Count++];
+    }
+
+
+    public void Shrink(int newSize)
+    {
+        if (newSize > Count)
+        {
+            throw new InvalidOperationException("The new size cannot be bigger than the current size.");
+        }
+
+        Count = newSize;
+    }
+
+    public void Initialize(ByteStringContext ctx, int count = 1)
+    {
+        if (count > MaxCapacity)
+        {
+            ThrowMaxCapacityExceeded(count);
+        }
+
+        var newSize = count == 1
+            ? sizeof(T)
+            : Math.Max(sizeof(T), Math.Min(MaxCapacityInBytes, Bits.NextAllocationSize(sizeof(T) * count)));
+
+        if (newSize <= 0)
+            ThrowMaxCapacityExceeded(count);
+
+        ctx.Allocate(newSize, out _storage);
+        Capacity = _storage.Length / sizeof(T);
+    }
+
+    public void Grow(ByteStringContext ctx, int addition)
+    {
+        if (addition > MaxCapacity - Capacity)
+            ThrowMaxCapacityExceeded(addition + (long)Capacity);
+
+        var newSize = Math.Max(sizeof(T),
+            Math.Min(MaxCapacityInBytes, Bits.NextAllocationSize(sizeof(T) * (addition + Capacity))));
+        ctx.Allocate(newSize, out var mem);
+
+        if (_storage.HasValue)
+        {
+            Memory.Copy(mem.Ptr, _storage.Ptr, Count * sizeof(T));
+            ctx.Release(ref _storage);
+        }
+
+        _storage = mem;
+        Capacity = _storage.Length / sizeof(T);
+    }
+
+    public readonly void Sort()
+    {
+        if (typeof(T) == typeof(int) || typeof(T) == typeof(long))
+        {
+            VectorizedSort.Run(ToSpan());
+        }
+        else
+        {
+            ToSpan().Sort();
+        }
+    }
+
+    public void EnsureCapacityFor(ByteStringContext allocator, int additionalItems)
+    {
+        if (HasCapacityFor(additionalItems))
+        {
+            return;
+        }
+
+        Grow(allocator, additionalItems);
+    }
+
+    public readonly bool HasCapacityFor(int itemsToAdd)
+    {
+        return Count + itemsToAdd < Capacity;
+    }
+
+    public void ResetAndEnsureCapacity(ByteStringContext ctx, int size)
+    {
+        if (size > Capacity)
+        {
+            Grow(ctx, size - Capacity + 1);
+        }
+
+        // We will reset.
+        Count = 0;
+    }
+
+    public readonly int CopyTo(Span<T> destination, int startFrom)
+    {
+        if (Count == 0)
+        {
+            return 0;
+        }
+
+        var count = Math.Min(Count - startFrom, destination.Length);
+        new Span<T>(RawItems + startFrom, count).CopyTo(destination);
+
+        return count;
+    }
+
+    public readonly void CopyTo(Span<T> destination, int startFrom, int count)
+    {
+        if (Count == 0)
+        {
+            return;
+        }
+
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(count, Math.Min(Count - startFrom, destination.Length));
+
+        new Span<T>(RawItems + startFrom, count).CopyTo(destination);
+    }
+
+    public void Dispose(ByteStringContext ctx)
+    {
+        if (_storage.HasValue)
+            ctx.Release(ref _storage);
+        Capacity = 0;
+        Count = 0;
+
+#if DEBUG
+        _disposed = true;
+#endif
+    }
+
+    public void Clear()
+    {
+        Count = 0;
+    }
+
+    [DoesNotReturn]
+    private static void ThrowMaxCapacityExceeded(long requestedSize)
+    {
+        throw new InvalidOperationException($"{nameof(NativeList<>)}<{typeof(T).FullName}> cannot be larger than {MaxCapacity} items. Requested size: {requestedSize}");
+    }
+
+    public readonly Enumerator GetEnumerator() => new(RawItems, Count);
+
+    [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public struct Enumerator(T* items, int len) : IEnumerator<T>
+    {
+        private readonly T* _items = items;
+        private readonly int _len = len;
+        private int _index = -1;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool MoveNext()
+        {
+            int index = _index + 1;
+            if (index < _len)
+            {
+                _index = index;
+                return true;
+            }
+
+            return false;
+        }
+
+        public void Reset()
+        {
+            _index = -1;
+        }
+
+        object IEnumerator.Current => Current;
+
+        public T Current
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _items[_index];
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public readonly void Dispose()
+        {
+        }
+    }
+
+#if CORAX_MEMORY_WATCHER
+    public (long BytesUsed, long BytesAllocated) Allocations => (Count * sizeof(T), Capacity * sizeof(T));
+#endif
+
+    public readonly void Reverse()
+    {
+        ToSpan().Reverse();
+    }
+
+    public void SetCapacity(ByteStringContext allocator, int size)
+    {
+        if (Count >= size)
+        {
+            return;
+        }
+
+        EnsureCapacityFor(allocator, size);
+        for (int i = Count; i < size; i++)
+        {
+            RawItems[i] = default;
+        }
+        Count = size;
+    }
+
+    internal readonly Span<T> ToFullCapacitySpan()
+    {
+        return new Span<T>(_storage.Ptr, Capacity);
+    }
+
+    public static NativeList<T> Create(ByteStringContext allocator, T item)
+    {
+        var list = new NativeList<T>();
+        list.Add(allocator, item);
+        return list;
+    }
+}

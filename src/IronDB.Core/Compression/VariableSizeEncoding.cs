@@ -3,14 +3,15 @@ using System.Runtime.InteropServices;
 
 namespace IronDB.Core.Compression;
 
-internal static class VariableSizeEncoding
+public static class VariableSizeEncoding
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int ReadMany<T>(ReadOnlySpan<byte> buffer, int count, Span<T> output) where T : unmanaged
     {
         if (output.Length < count)
+        {
             goto FailCount;
-
+        }
 
         ref var bufferRef = ref MemoryMarshal.GetReference(buffer);
         ref var outputBufferRef = ref MemoryMarshal.GetReference(output);
@@ -23,11 +24,17 @@ internal static class VariableSizeEncoding
             {
 
                 if (typeof(T) == typeof(bool))
+                {
                     outputRef = (T)(object)(Unsafe.Add(ref bufferRef, pos) == 1);
+                }
                 else if (typeof(T) == typeof(sbyte))
+                {
                     outputRef = (T)(object)(sbyte)Unsafe.Add(ref bufferRef, pos);
+                }
                 else
+                {
                     outputRef = (T)(object)Unsafe.Add(ref bufferRef, pos);
+                }
 
                 pos += 1;
                 continue;
@@ -45,7 +52,9 @@ internal static class VariableSizeEncoding
                 ul |= (long)(b & 0x7F);
                 offset++;
                 if ((b & 0x80) == 0)
+                {
                     goto End;
+                }
 
                 b = Unsafe.Add(ref bufferRef, pos + 1);
                 ul |= (long)(b & 0x7F) << 7;

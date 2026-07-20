@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace IronDB.Core.Server.Utils;
 
-internal static class Sorting
+public static class Sorting
 {
     public static int SortAndMinOnDuplicates(Span<long> values, Span<float> itemsAssociated)
     {
@@ -111,7 +111,10 @@ internal static class Sorting
         where T : unmanaged, IBinaryNumber<T>
     {
         if (count == 0)
+        {
             return 0;
+        }
+
         Debug.Assert(count > 0);
 
         VectorizedSort.Run(bufferBasePtr, count);
