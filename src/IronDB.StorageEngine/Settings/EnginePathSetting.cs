@@ -1,6 +1,6 @@
 ﻿namespace IronDB.StorageEngine.Settings;
 
-public sealed class EnginePathSetting : PathSettingBase<EnginePathSetting>
+public class EnginePathSetting : PathSettingBase<EnginePathSetting>
 {
     public EnginePathSetting(string path, string? baseDataDir = null)
         : base(path, baseDataDir != null ? new EnginePathSetting(baseDataDir) : null)
