@@ -1,8 +1,10 @@
+using IronDB.StorageEngine.Settings;
+
 namespace IronDB.StorageEngine.Impl.Paging;
 
 public abstract unsafe class AbstractPager
 {
-    public string FileName => throw new NotImplementedException();
+    public EnginePathSetting FileName { get; protected set; } = default!;
 
     public StorageEnvironmentOptions Options => throw new NotImplementedException();
 

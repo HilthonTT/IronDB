@@ -23,7 +23,7 @@ public sealed unsafe class FastPForEncoder(ByteStringContext allocator) : IDispo
     private ushort _sharedPrefix;
     private readonly List<uint>[] _exceptions = new List<uint>[33];
     private readonly int[] _exceptionsStart = new int[33];
-    private readonly List<byte> _metadata = new();
+    private readonly List<byte> _metadata = [];
     private int _metadataPos;
     private ByteStringContext<ByteStringMemoryCache>.InternalScope _entriesOutputScope;
 

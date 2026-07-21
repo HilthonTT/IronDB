@@ -29,4 +29,14 @@ public sealed unsafe class LowLevelTransaction : IPagerLevelTransactionState
     {
         throw new NotImplementedException();
     }
+
+    public void MarkTransactionAsFailed()
+    {
+        throw new NotImplementedException();
+    }
+
+    public string GetTxState()
+    {
+        throw new NotImplementedException();
+    }
 }
