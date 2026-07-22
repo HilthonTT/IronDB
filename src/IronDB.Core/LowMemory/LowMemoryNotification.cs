@@ -188,8 +188,9 @@ public sealed class LowMemoryNotification
         inactiveHandlers.ForEach(x => _lowMemoryHandlers.TryRemove(x));
     }
 
-    public void RegisterLowMemoryHandler(ILowMemoryHandler handler)
+    public void RegisterLowMemoryHandler(ILowMemoryHandler? handler)
     {
+        ArgumentNullException.ThrowIfNull(handler, nameof(handler));
         _lowMemoryHandlers.Add(new WeakReference<ILowMemoryHandler>(handler));
     }
 

@@ -6,8 +6,11 @@ namespace IronDB.StorageEngine.Impl;
 
 public sealed unsafe class LowLevelTransaction : IPagerLevelTransactionState
 {
-    public Dictionary<AbstractPager, TransactionState> PagerTransactionState32Bits { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public Dictionary<AbstractPager, CryptoTransactionState> CryptoPagerTransactionState { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    internal readonly PageLocator _pageLocator = default!;
+
+    public Dictionary<AbstractPager, TransactionState> PagerTransactionState32Bits { get; set; } = [];
+
+    public Dictionary<AbstractPager, CryptoTransactionState> CryptoPagerTransactionState { get; set; } = [];
 
     public Size AdditionalMemoryUsageSize => throw new NotImplementedException();
 

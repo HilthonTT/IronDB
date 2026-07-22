@@ -18,7 +18,7 @@ public interface IPagerLevelTransactionState : IDisposable
 
     void EnsurePagerStateReference(ref PagerState state);
 
-    StorageEnvironment Environment { get; }
+    StorageEnvironment? Environment { get; }
 
     bool IsWriteTransaction { get; }
 }

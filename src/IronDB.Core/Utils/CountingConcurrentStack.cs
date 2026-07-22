@@ -2,7 +2,7 @@
 
 namespace IronDB.Core.Utils;
 
-internal sealed class CountingConcurrentStack<TItem>
+public sealed class CountingConcurrentStack<TItem>
 {
     private readonly ConcurrentStack<TItem> _stack = new();
     private long _count;

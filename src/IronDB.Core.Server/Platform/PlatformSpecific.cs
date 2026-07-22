@@ -72,12 +72,14 @@ public static unsafe class PlatformSpecific
             return allocate4KbAlignedMemory;
         }
 
-        public static void Free4KbAlignedMemory(byte* ptr, long size, Core.Utils.NativeMemory.ThreadStats stats)
+        public static void Free4KbAlignedMemory(byte* ptr, long size, Core.Utils.NativeMemory.ThreadStats? stats)
         {
-            Debug.Assert(ptr != null);
+            Debug.Assert(ptr is not null);
 
             if (stats != null)
+            {
                 Core.Utils.NativeMemory.UpdateMemoryStatsForThread(stats, size);
+            }
 
             Interlocked.Add(ref Core.Utils.NativeMemory._totalAllocatedMemory, -size);
 

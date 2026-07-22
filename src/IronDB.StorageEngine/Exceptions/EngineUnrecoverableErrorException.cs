@@ -6,6 +6,7 @@ namespace IronDB.StorageEngine.Exceptions;
 
 public class EngineUnrecoverableErrorException : Exception
 {
+    [DoesNotReturn]
     public static void Raise(LowLevelTransaction tx, string message)
     {
         try
@@ -36,6 +37,7 @@ public class EngineUnrecoverableErrorException : Exception
         }
     }
 
+    [DoesNotReturn]
     public static void Raise(StorageEnvironmentOptions options, string message)
     {
         try
@@ -50,6 +52,7 @@ public class EngineUnrecoverableErrorException : Exception
         }
     }
 
+    [DoesNotReturn]
     public static void Raise(StorageEnvironment env, string message, Exception inner)
     {
         try
@@ -64,6 +67,7 @@ public class EngineUnrecoverableErrorException : Exception
         }
     }
 
+    [DoesNotReturn]
     public static void Raise(StorageEnvironmentOptions options, string message, Exception inner)
     {
         try
@@ -78,6 +82,7 @@ public class EngineUnrecoverableErrorException : Exception
         }
     }
 
+    [DoesNotReturn]
     public static void Raise(string message, Exception inner)
     {
         throw new EngineUnrecoverableErrorException(message, inner);
