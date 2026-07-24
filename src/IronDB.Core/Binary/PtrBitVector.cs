@@ -5,7 +5,7 @@ using System.Text;
 
 namespace IronDB.Core.Binary;
 
-internal readonly unsafe struct PtrBitVector
+public readonly unsafe struct PtrBitVector
 {
     public readonly byte* Bits;
     public readonly int Count;

@@ -1,4 +1,5 @@
 ﻿using IronDB.StorageEngine.Data.BTrees;
+using IronDB.StorageEngine.Data.Fixed;
 
 namespace IronDB.StorageEngine;
 
@@ -48,9 +49,24 @@ public sealed unsafe class Constants
 
         static Tree()
         {
-            Assert(() => PageHeaderSize == sizeof(TreePageHeader), () => $"{nameof(TreePageHeader)} size has changed and not updated at Voron.Global.Constants.");
-            Assert(() => NodeHeaderSize == sizeof(TreeNodeHeader), () => $"{nameof(TreeNodeHeader)} size has changed and not updated at Voron.Global.Constants.");
+            Assert(() => PageHeaderSize == sizeof(TreePageHeader), () => $"{nameof(TreePageHeader)} size has changed and not updated at StorageEngine.Global.Constants.");
+            Assert(() => NodeHeaderSize == sizeof(TreeNodeHeader), () => $"{nameof(TreeNodeHeader)} size has changed and not updated at StorageEngine.Global.Constants.");
         }
+    }
+
+    public static class FixedSizeTree
+    {
+        public const int PageHeaderSize = FixedSizeTreePageHeader.SizeOf;
+
+        static FixedSizeTree()
+        {
+            Assert(() => PageHeaderSize == sizeof(FixedSizeTreePageHeader), () => $"{nameof(FixedSizeTreePageHeader)} size has changed and not updated at StorageEngine.Global.Constants.");
+        }
+    }
+
+    public static class CompactTree
+    {
+        public const int MaximumKeySize = 1024;
     }
 
     public static void Assert(Func<bool> condition, Func<string> reason)

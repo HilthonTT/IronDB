@@ -7,7 +7,7 @@ using System.Text;
 
 namespace IronDB.Core.Binary;
 
-internal readonly ref struct BitVector
+public readonly ref struct BitVector
 {
     public const int BitsPerByte = 8;
     public const int BitsPerWord = sizeof(ulong) * BitsPerByte; // 64
